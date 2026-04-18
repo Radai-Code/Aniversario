@@ -1,0 +1,1373 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para Ti 💖</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --rose: #e8a0b4;
+            --rose-deep: #c2678a;
+            --rose-pale: #fdf0f5;
+            --gold: #d4a76a;
+            --gold-light: #f0d9b5;
+            --ink: #3a2a35;
+            --parchment: #fef9f2;
+            --shadow: rgba(60, 20, 40, 0.18);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: radial-gradient(ellipse at 30% 20%, #fce4ec 0%, #f8bbd0 30%, #f48fb1 60%, #e91e8c22 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Cormorant Garamond', serif;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* PARTICLES */
+        #particles-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* TITLE */
+        .title-area {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .title-area h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.4rem, 4vw, 2.2rem);
+            color: var(--rose-deep);
+            letter-spacing: 0.04em;
+            text-shadow: 0 2px 12px rgba(194, 103, 138, 0.3);
+        }
+
+        .title-area .subtitle {
+            font-size: 0.95rem;
+            color: var(--rose-deep);
+            opacity: 0.7;
+            font-style: italic;
+            margin-top: 4px;
+        }
+
+        /* COUNTER */
+        .counter-box {
+            position: relative;
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.55);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(232, 160, 180, 0.5);
+            border-radius: 50px;
+            padding: 8px 24px;
+            margin-bottom: 18px;
+            font-size: 0.9rem;
+            color: var(--ink);
+            text-align: center;
+            box-shadow: 0 4px 20px var(--shadow);
+        }
+
+        .counter-box span {
+            color: var(--rose-deep);
+            font-weight: 700;
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* BOOK SCENE */
+        .book-scene {
+            position: relative;
+            z-index: 10;
+            perspective: 1800px;
+            width: min(380px, 90vw);
+            height: min(480px, 70vh);
+        }
+
+        .book {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+        }
+
+        /* BOOK SHADOW */
+        .book::after {
+            content: '';
+            position: absolute;
+            bottom: -24px;
+            left: 10%;
+            width: 80%;
+            height: 30px;
+            background: radial-gradient(ellipse, rgba(194, 103, 138, 0.35) 0%, transparent 70%);
+            filter: blur(6px);
+        }
+
+        /* SPINE */
+        .book-spine {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 28px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--rose-deep) 0%, #a04e70 50%, var(--rose-deep) 100%);
+            border-radius: 6px 0 0 6px;
+            box-shadow: -3px 0 12px rgba(60, 20, 40, 0.3);
+            z-index: 5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .spine-decoration {
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: var(--gold);
+            box-shadow: 0 0 4px var(--gold);
+        }
+
+        /* PAGES STACK */
+        .pages-stack {
+            position: absolute;
+            left: 28px;
+            top: 4px;
+            width: calc(100% - 32px);
+            height: calc(100% - 8px);
+            border-radius: 0 10px 10px 0;
+            overflow: hidden;
+            background: #f5e6ea;
+            box-shadow: inset -3px 0 8px rgba(60, 20, 40, 0.1);
+        }
+
+        /* INDIVIDUAL PAGE */
+        .page {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--parchment);
+            border-radius: 0 10px 10px 0;
+            transform-origin: left center;
+            transform-style: preserve-3d;
+            transition: transform 0.9s cubic-bezier(0.645, 0.045, 0.355, 1.000);
+            cursor: pointer;
+            backface-visibility: hidden;
+        }
+
+        .page.flipped {
+            transform: rotateY(-180deg);
+        }
+
+        /* PAGE FRONT & BACK */
+        .page-front,
+        .page-back {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 28px 24px 24px 28px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0 10px 10px 0;
+            backface-visibility: hidden;
+        }
+
+        .page-back {
+            transform: rotateY(180deg);
+            background: #fdf5f8;
+        }
+
+        /* PAGE CURL EFFECT */
+        .page::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 0 0 32px 32px;
+            border-color: transparent transparent rgba(232, 160, 180, 0.25) transparent;
+            transition: all 0.3s;
+            z-index: 2;
+        }
+
+        .page:hover::before {
+            border-width: 0 0 52px 52px;
+            border-color: transparent transparent rgba(232, 160, 180, 0.5) transparent;
+        }
+
+        /* PAGE LINES */
+        .page-front::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(transparent,
+                    transparent 30px,
+                    rgba(232, 160, 180, 0.12) 30px,
+                    rgba(232, 160, 180, 0.12) 31px);
+            border-radius: 0 10px 10px 0;
+            pointer-events: none;
+        }
+
+        /* PAGE NUMBER */
+        .page-number {
+            position: absolute;
+            bottom: 14px;
+            font-size: 0.7rem;
+            color: rgba(60, 20, 40, 0.35);
+            font-style: italic;
+            letter-spacing: 0.1em;
+        }
+
+        .page-front .page-number {
+            right: 18px;
+        }
+
+        .page-back .page-number {
+            left: 18px;
+        }
+
+        /* PAGE CONTENT */
+        .page-day {
+            font-family: 'Playfair Display', serif;
+            font-size: 0.75rem;
+            color: var(--rose-deep);
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            opacity: 0.7;
+        }
+
+        .page-quote {
+            font-size: clamp(1rem, 3vw, 1.3rem);
+            color: var(--ink);
+            text-align: center;
+            line-height: 1.7;
+            font-style: italic;
+            margin-bottom: 16px;
+        }
+
+        .page-heart-deco {
+            font-size: 1.4rem;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .page-date-small {
+            font-size: 0.7rem;
+            color: rgba(60, 20, 40, 0.4);
+            margin-top: 10px;
+            letter-spacing: 0.05em;
+        }
+
+        .page-ornament {
+            width: 60px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+            margin: 10px auto;
+        }
+
+        /* COVER */
+        .book-cover {
+            position: absolute;
+            top: 0;
+            left: 28px;
+            width: calc(100% - 28px);
+            height: 100%;
+            background: linear-gradient(135deg, #f4b8cf 0%, #e8839f 40%, #c2678a 100%);
+            border-radius: 0 12px 12px 0;
+            z-index: 20;
+            transform-origin: left center;
+            transform-style: preserve-3d;
+            transition: transform 1.2s cubic-bezier(0.645, 0.045, 0.355, 1.000);
+            cursor: pointer;
+            box-shadow: 6px 0 30px rgba(60, 20, 40, 0.25);
+        }
+
+        .book-cover.open {
+            transform: rotateY(-175deg);
+            pointer-events: none;
+        }
+
+        .cover-inner {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0 12px 12px 0;
+            padding: 30px;
+            background: linear-gradient(135deg, #f4b8cf 0%, #e8839f 40%, #c2678a 100%);
+        }
+
+        .cover-back {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #fdf0f5;
+            border-radius: 0 12px 12px 0;
+            transform: rotateY(180deg);
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .cover-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.6rem, 6vw, 2.4rem);
+            color: white;
+            text-align: center;
+            text-shadow: 0 2px 12px rgba(60, 20, 40, 0.3);
+            line-height: 1.3;
+            font-style: italic;
+        }
+
+        .cover-hearts {
+            font-size: 2rem;
+            margin: 16px 0;
+            animation: pulse 2.5s ease-in-out infinite;
+        }
+
+        .cover-subtitle {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-align: center;
+            font-style: italic;
+            margin-top: 8px;
+        }
+
+        .cover-border {
+            position: absolute;
+            inset: 12px;
+            border: 1.5px solid rgba(255, 255, 255, 0.4);
+            border-radius: 0 8px 8px 0;
+        }
+
+        .cover-tap {
+            position: absolute;
+            bottom: 24px;
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.7);
+            animation: blink 2s ease-in-out infinite;
+            letter-spacing: 0.1em;
+        }
+
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 0.5
+            }
+
+            50% {
+                opacity: 1
+            }
+        }
+
+        /* BACK COVER */
+        .book-back-cover {
+            position: absolute;
+            top: 0;
+            left: 28px;
+            width: calc(100% - 28px);
+            height: 100%;
+            background: linear-gradient(135deg, #e8839f 0%, #c2678a 100%);
+            border-radius: 0 12px 12px 0;
+            z-index: 1;
+        }
+
+        /* NAV BUTTONS */
+        .nav-area {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-top: 22px;
+        }
+
+        .nav-btn {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            border: 2px solid rgba(194, 103, 138, 0.5);
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(8px);
+            color: var(--rose-deep);
+            font-size: 1.3rem;
+            cursor: pointer;
+            transition: all 0.25s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 14px var(--shadow);
+        }
+
+        .nav-btn:hover {
+            background: var(--rose-deep);
+            color: white;
+            border-color: var(--rose-deep);
+            transform: scale(1.08);
+        }
+
+        .nav-btn:active {
+            transform: scale(0.96);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.3;
+            cursor: default;
+            transform: none;
+        }
+
+        .page-indicator {
+            font-family: 'Playfair Display', serif;
+            font-size: 0.85rem;
+            color: var(--ink);
+            opacity: 0.65;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        /* TODAY BADGE */
+        .today-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--rose-deep);
+            color: white;
+            font-size: 0.7rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            padding: 4px 12px;
+            border-radius: 20px;
+            margin-bottom: 10px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        /* CONFETTI BURST */
+        .confetti-piece {
+            position: fixed;
+            width: 8px;
+            height: 8px;
+            border-radius: 2px;
+            pointer-events: none;
+            z-index: 100;
+            animation: confetti-fall linear forwards;
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(80vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.12);
+            }
+        }
+
+        /* RIPPLE */
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(232, 160, 180, 0.4);
+            transform: scale(0);
+            animation: ripple-out 0.6s linear forwards;
+            pointer-events: none;
+        }
+
+        @keyframes ripple-out {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        /* SPARKLE */
+        .sparkle {
+            position: fixed;
+            width: 6px;
+            height: 6px;
+            background: var(--gold);
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+            pointer-events: none;
+            z-index: 99;
+            animation: sparkle-anim 1s ease-out forwards;
+        }
+
+        @keyframes sparkle-anim {
+            0% {
+                transform: scale(0) rotate(0deg);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.5) rotate(180deg);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(0) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* FLOATING HEARTS */
+        .float-heart {
+            position: fixed;
+            font-size: 1.2rem;
+            pointer-events: none;
+            z-index: 99;
+            animation: float-up 3s ease-out forwards;
+        }
+
+        @keyframes float-up {
+            0% {
+                transform: translateY(0) scale(1);
+                opacity: 0.9;
+            }
+
+            100% {
+                transform: translateY(-70vh) scale(0.3);
+                opacity: 0;
+            }
+        }
+
+        /* PAGE FLIP SOUND VISUAL */
+        .flip-indicator {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            font-size: 0.75rem;
+            color: var(--rose-deep);
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 50;
+            font-style: italic;
+        }
+
+        .flip-indicator.show {
+            opacity: 1;
+        }
+
+        /* TOOLTIP */
+        .tooltip {
+            position: fixed;
+            background: rgba(60, 20, 40, 0.85);
+            color: white;
+            font-size: 0.78rem;
+            padding: 8px 14px;
+            border-radius: 20px;
+            pointer-events: none;
+            z-index: 200;
+            opacity: 0;
+            transition: opacity 0.3s;
+            white-space: nowrap;
+            backdrop-filter: blur(8px);
+        }
+
+        .tooltip.show {
+            opacity: 1;
+        }
+
+        /* MOBILE */
+        @media (max-width: 500px) {
+            .book-scene {
+                height: 60vh;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <canvas id="particles-canvas"></canvas>
+
+    <div class="title-area">
+        <h1>Nuestro Libro de Amor</h1>
+        <p class="subtitle">Una página por cada día juntos</p>
+    </div>
+
+    <div class="counter-box" id="counter-box">
+        Llevamos <span id="days-count">0</span> días juntos · <span id="hms">00h 00m 00s</span>
+    </div>
+
+    <div class="book-scene">
+        <div class="book" id="book">
+            <!-- Back cover -->
+            <div class="book-back-cover"></div>
+
+            <!-- Spine -->
+            <div class="book-spine">
+                <div class="spine-decoration"></div>
+                <div class="spine-decoration"></div>
+                <div class="spine-decoration"></div>
+            </div>
+
+            <!-- Pages stack -->
+            <div class="pages-stack" id="pages-stack"></div>
+
+            <!-- Front cover -->
+            <div class="book-cover" id="book-cover" onclick="openBook()">
+                <div class="cover-inner">
+                    <div class="cover-border"></div>
+                    <div class="cover-hearts">💖</div>
+                    <div class="cover-title">Para Ti,<br>Amor Mío</div>
+                    <div class="cover-subtitle">Cada página, un día contigo</div>
+                    <div class="cover-tap">✦ Toca para abrir ✦</div>
+                </div>
+                <div class="cover-back">
+                    <p style="color:var(--rose-deep);font-style:italic;text-align:center;font-size:0.9rem;">Gracias por
+                        ser parte de mi historia 💖</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="nav-area" id="nav-area" style="display:none">
+        <button class="nav-btn" id="prev-btn" onclick="prevPage()" title="Página anterior">‹</button>
+        <div class="page-indicator" id="page-indicator">1 / 1</div>
+        <button class="nav-btn" id="next-btn" onclick="nextPage()" title="Página siguiente">›</button>
+    </div>
+
+    <div class="flip-indicator" id="flip-indicator">pasando página...</div>
+    <div class="tooltip" id="tooltip"></div>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+     🎵 MÚSICA — Este elemento reproduce tu canción automáticamente
+     al abrir el libro. El archivo debe estar en la MISMA carpeta.
+     El nombre del archivo se configura arriba en: const MUSIC_FILE
+     ═══════════════════════════════════════════════════════════════ -->
+    <audio id="bg-music" loop>
+        <!-- El src se asigna por JavaScript usando MUSIC_FILE -->
+    </audio>
+
+    <script>
+        // ═══════════════════════════════════════════
+        // CONFIG — Cambia la fecha de aniversario aquí
+        // ═══════════════════════════════════════════
+        const ANNIVERSARY = new Date("2024-12-13T00:00:00");
+
+        // ═══════════════════════════════════════════════════════════════════
+        // 🎵 MÚSICA — Pon el nombre de tu archivo de música aquí abajo.
+        //    Descarga tu canción y ponla en la MISMA carpeta que este archivo.
+        //    Luego cambia "tu-cancion.mp3" por el nombre exacto de tu archivo.
+        //    Ejemplo: si tu archivo se llama "perfect.mp3" pon "perfect.mp3"
+        // ═══════════════════════════════════════════════════════════════════
+        const MUSIC_FILE = "tu-cancion.mp3"; // ← CAMBIA ESTO por el nombre de tu archivo
+
+        // ═══════════════════════════════════════════════════════════════════
+        // FRASES — 366 frases únicas, una para cada día del año juntos
+        // La última (índice 365) es la página especial de aniversario 💖
+        // ═══════════════════════════════════════════════════════════════════
+        const frases = [
+            { text: "Eres la primera persona en quien pienso cada mañana y el último pensamiento antes de dormir.", emoji: "🌅" },
+            { text: "Contigo aprendí que el amor no es un destino, sino el camino que recorremos juntos.", emoji: "🛤️" },
+            { text: "Tu risa es la melodía favorita de mi corazón.", emoji: "🎵" },
+            { text: "Gracias por elegirme cada día. Yo también te elijo a ti, siempre.", emoji: "💫" },
+            { text: "Eres mi lugar favorito en el mundo entero.", emoji: "🏡" },
+            { text: "Cuando estás cerca, todo lo demás pierde importancia.", emoji: "✨" },
+            { text: "Me enamoré de ti mil veces y cada vez fue diferente.", emoji: "💘" },
+            { text: "Eres la respuesta que no sabía que estaba buscando.", emoji: "🔑" },
+            { text: "Contigo, incluso los días ordinarios se vuelven extraordinarios.", emoji: "🌟" },
+            { text: "Tu amor me hace querer ser la mejor versión de mí mismo.", emoji: "🌱" },
+            { text: "Nuestras manos encajan perfectamente, como si siempre hubieran estado hechas la una para la otra.", emoji: "🤝" },
+            { text: "Eres todo lo que pedí y todo lo que no supe pedir.", emoji: "🎁" },
+            { text: "Cada momento contigo es un recuerdo que atesoro.", emoji: "📸" },
+            { text: "Eres mi calma en medio de la tormenta.", emoji: "🌈" },
+            { text: "Te amo más de lo que las palabras pueden expresar, pero lo intento cada día.", emoji: "📝" },
+            { text: "Gracias por hacerme sentir en casa, estés donde estés.", emoji: "🏠" },
+            { text: "Con cada amanecer me doy cuenta de lo afortunado que soy de tenerte.", emoji: "🌄" },
+            { text: "Tus ojos guardan todos los universos que quiero explorar.", emoji: "🌌" },
+            { text: "Eres la historia de amor más bonita que jamás podría haber imaginado.", emoji: "📖" },
+            { text: "Mi corazón te reconoció antes de que mi mente lo entendiera.", emoji: "💗" },
+            { text: "Cada día contigo es razón suficiente para sonreír.", emoji: "😊" },
+            { text: "Eres la primera y última persona con quien quiero hablar cada día.", emoji: "💬" },
+            { text: "Tu amor convirtió mi mundo en un lugar más cálido y brillante.", emoji: "☀️" },
+            { text: "Gracias por quedarte. Por elegirme. Por amarme.", emoji: "🌹" },
+            { text: "Contigo descubrí que el amor más bonito es el que crece con el tiempo.", emoji: "🌺" },
+            { text: "Eres mi aventura favorita y mi descanso más dulce.", emoji: "⛵" },
+            { text: "Cada abrazo tuyo me dice todo lo que necesito escuchar.", emoji: "🤗" },
+            { text: "Me gusta quien soy cuando estoy contigo.", emoji: "🌻" },
+            { text: "Eres la razón por la que creo en los cuentos de hadas.", emoji: "🧚" },
+            { text: "Te quiero hoy, mañana y todos los días que vengan después.", emoji: "♾️" },
+            { text: "Eres el tipo de persona que hace que todo valga la pena.", emoji: "💎" },
+            { text: "Tu presencia llena los espacios que no sabía que estaban vacíos.", emoji: "🌸" },
+            { text: "Amor mío, eres mi sol en los días nublados.", emoji: "🌤️" },
+            { text: "Contigo aprendí que el silencio también puede ser una forma de amor.", emoji: "🤫" },
+            { text: "Hay magia en la forma en que me miras.", emoji: "✨" },
+            { text: "Eres el capítulo favorito de mi vida.", emoji: "📚" },
+            { text: "Tu amor es lo más parecido a un hogar que he sentido.", emoji: "🏡" },
+            { text: "Gracias por hacer que los lunes sean un poco más fáciles.", emoji: "💪" },
+            { text: "Eres la persona con quien quiero compartir cada pequeña victoria.", emoji: "🏆" },
+            { text: "Tu forma de ser me inspira a ser mejor cada día.", emoji: "🌠" },
+            { text: "No existe lugar donde no piense en ti.", emoji: "🗺️" },
+            { text: "Me haces sentir que soy suficiente, exactamente como soy.", emoji: "💝" },
+            { text: "Cada conversación contigo es mi parte favorita del día.", emoji: "☕" },
+            { text: "Tu amor es la melodía de fondo de mi vida.", emoji: "🎶" },
+            { text: "Eres mi persona favorita en todo el mundo.", emoji: "🌍" },
+            { text: "Gracias por ver lo mejor en mí, incluso cuando yo no lo veo.", emoji: "🔭" },
+            { text: "Contigo el tiempo pasa volando y aun así siempre quiero más.", emoji: "⏳" },
+            { text: "Eres el recordatorio diario de que la vida puede ser hermosa.", emoji: "🌷" },
+            { text: "Nuestras risas juntos son mi tesoro más preciado.", emoji: "😂" },
+            { text: "Cada vez que pienso en ti, algo en mí se tranquiliza.", emoji: "🕊️" },
+            { text: "Eres la historia que quiero seguir escribiendo para siempre.", emoji: "✍️" },
+            { text: "Tu amor me enseñó que rendirse nunca era la opción.", emoji: "🔥" },
+            { text: "Me enamoro de nuevo cada vez que te escucho hablar de lo que amas.", emoji: "🗣️" },
+            { text: "Eres el tipo de amor del que hablan las canciones.", emoji: "🎸" },
+            { text: "Gracias por caminar a mi lado, nunca delante ni detrás.", emoji: "👣" },
+            { text: "Tu amor es discreto, pero lo siento en todo.", emoji: "🌊" },
+            { text: "Cada pequeño gesto tuyo me dice más que mil palabras.", emoji: "🌼" },
+            { text: "Eres mi motivo favorito para quedarme.", emoji: "⚓" },
+            { text: "Contigo no tengo miedo de ser yo mismo.", emoji: "🦋" },
+            { text: "Tu amor es el tipo que no grita, pero siempre está.", emoji: "🕯️" },
+            { text: "Gracias por ser mi equipo favorito.", emoji: "🤜🤛" },
+            { text: "Eres la persona que mi corazón eligió sin pedirle permiso a mi mente.", emoji: "💓" },
+            { text: "Cada día a tu lado es un regalo que no merezco pero recibo con todo el amor.", emoji: "🎀" },
+            { text: "Tu voz es lo que más extraño cuando no estás.", emoji: "📞" },
+            { text: "Eres mi compañero favorito de aventuras y de sofá.", emoji: "🛋️" },
+            { text: "Gracias por hacer que confiar sea fácil.", emoji: "🔐" },
+            { text: "Eres la persona con quien quiero ver amanecer y atardecer.", emoji: "🌅" },
+            { text: "Tu amor es como el viento: no siempre lo veo pero siempre lo siento.", emoji: "🍃" },
+            { text: "Contigo aprendí que el amor verdadero es tranquilo y constante.", emoji: "🌙" },
+            { text: "Eres todo lo bueno que me ha pasado en un solo ser.", emoji: "🌟" },
+            { text: "Gracias por hacer que mi mundo tenga más colores.", emoji: "🎨" },
+            { text: "Tu presencia es el mejor antídoto contra cualquier mal día.", emoji: "💊" },
+            { text: "Eres la razón por la que creo en el buen amor.", emoji: "🌹" },
+            { text: "Contigo soy más valiente, más vivo, más yo.", emoji: "🦁" },
+            { text: "Cada noche que pienso en ti, duermo con una sonrisa.", emoji: "😴" },
+            { text: "Tu amor es la cosa más honesta que he recibido.", emoji: "🤍" },
+            { text: "Gracias por quedarte cuando lo fácil era irse.", emoji: "🌧️" },
+            { text: "Eres mi favorito en todas las versiones de mi vida.", emoji: "🔄" },
+            { text: "Tu amor me hace sentir que puedo con todo.", emoji: "🚀" },
+            { text: "Contigo no necesito nada más para ser feliz.", emoji: "🎈" },
+            { text: "Eres la persona que me hace creer que el futuro vale la pena.", emoji: "🌈" },
+            { text: "Tu mirada vale más que cualquier poema.", emoji: "👀" },
+            { text: "Gracias por ser mi refugio en los momentos difíciles.", emoji: "🏕️" },
+            { text: "Eres la constante más bonita de mi vida.", emoji: "∞" },
+            { text: "Contigo cada despedida es un 'hasta luego' que me ilusiona.", emoji: "👋" },
+            { text: "Tu amor es la razón por la que me levanto con ganas.", emoji: "🌻" },
+            { text: "Eres el mejor compañero que pudo darme la vida.", emoji: "🌺" },
+            { text: "Gracias por creer en mí cuando yo no lo hacía.", emoji: "🙏" },
+            { text: "Tu amor me salvó de muchas versiones oscuras de mí mismo.", emoji: "🕯️" },
+            { text: "Eres la prueba de que las cosas buenas sí pasan.", emoji: "✅" },
+            { text: "Contigo no existe el aburrimiento, solo la calidez.", emoji: "🍵" },
+            { text: "Tu amor me hizo entender lo que realmente importa.", emoji: "💡" },
+            { text: "Eres la persona con quien quiero envejecer riendo.", emoji: "👴👵" },
+            { text: "Gracias por amarme en mis días grises también.", emoji: "🌫️" },
+            { text: "Tu corazón es el lugar más seguro que conozco.", emoji: "🏰" },
+            { text: "Eres la persona que me hace sentir que todo tiene sentido.", emoji: "🧩" },
+            { text: "Contigo incluso las discusiones me hacen amarte más.", emoji: "🌪️" },
+            { text: "Tu amor es como el océano: profundo, vasto, y lleno de vida.", emoji: "🌊" },
+            { text: "Gracias por enseñarme que el amor también puede ser paz.", emoji: "☮️" },
+            { text: "Eres la persona con quien quiero compartir todos mis secretos.", emoji: "🗝️" },
+            { text: "Tu amor es el más real que he conocido.", emoji: "💯" },
+            { text: "Contigo aprendí a valorar los momentos pequeños.", emoji: "🔮" },
+            { text: "Eres el motivo por el que agradezco cada día que pasa.", emoji: "🙌" },
+            { text: "Tu presencia es el mejor regalo que me da el universo.", emoji: "🎁" },
+            { text: "Gracias por ser constante en un mundo que cambia tanto.", emoji: "⚓" },
+            { text: "Eres la persona que hace que todo valga la pena.", emoji: "🏅" },
+            { text: "Tu amor me hace sentir en casa en cualquier lugar.", emoji: "🌍" },
+            { text: "Contigo cada nuevo día es una promesa que me emociona.", emoji: "🌄" },
+            { text: "Eres mi razón favorita para sonreír sin motivo.", emoji: "😄" },
+            { text: "Tu amor es infinito y yo lo siento en cada pequeña cosa.", emoji: "💞" },
+            { text: "Gracias por hacerme reír cuando más lo necesito.", emoji: "😂" },
+            { text: "Eres la persona más especial que ha entrado a mi vida.", emoji: "⭐" },
+            { text: "Tu amor es suave, pero tiene la fuerza de mover montañas.", emoji: "⛰️" },
+            { text: "Contigo encontré lo que significa sentirse comprendido.", emoji: "🤝" },
+            { text: "Eres la persona que mi alma andaba buscando sin saberlo.", emoji: "🧭" },
+            { text: "Tu amor convirtió mis miedos en valentía.", emoji: "🛡️" },
+            { text: "Gracias por hacerme sentir amado de formas que no sabía que existían.", emoji: "💌" },
+            { text: "Eres mi razón de ser en muchos sentidos.", emoji: "🌙" },
+            { text: "Tu amor es como la luna: constante, hermoso, y siempre presente.", emoji: "🌕" },
+            { text: "Contigo la vida tiene un sabor completamente diferente.", emoji: "🍓" },
+            { text: "Eres la persona que me hace creer en el amor de verdad.", emoji: "💖" },
+            { text: "Tu amor es lo más valioso que guardo.", emoji: "💎" },
+            { text: "Gracias por elegirme una y otra vez, cada día.", emoji: "🔁" },
+            { text: "Eres la persona con quien quiero construir todo.", emoji: "🏗️" },
+            { text: "Tu amor me hace sentir que nunca estoy solo.", emoji: "🤲" },
+            { text: "Contigo el futuro se ve brillante y lleno de amor.", emoji: "🌟" },
+            { text: "Eres la melodía que nunca quiero dejar de escuchar.", emoji: "🎼" },
+            { text: "Tu amor es todo lo que necesito y más.", emoji: "🌸" },
+            { text: "Gracias por ser mi persona favorita en este mundo.", emoji: "🥇" },
+            { text: "Eres el amor que nunca supe que merecía hasta que llegaste.", emoji: "💗" },
+            { text: "Tu presencia lo cambia todo para bien.", emoji: "🌈" },
+            { text: "Contigo cada instante vale una eternidad.", emoji: "⌛" },
+            { text: "Eres la persona más bonita que he tenido el privilegio de amar.", emoji: "🌺" },
+            { text: "Tu amor es la aventura más grande de mi vida.", emoji: "🗺️" },
+            { text: "Gracias por amarme con paciencia y con ternura.", emoji: "🫶" },
+            { text: "Eres mi compañero de vida más preciado.", emoji: "💑" },
+            { text: "Tu amor me hace sentir que todo es posible.", emoji: "🚀" },
+            { text: "Contigo aprendí que el amor no duele, el amor sana.", emoji: "🩹" },
+            { text: "Eres la razón por la que creo que lo mejor siempre está por venir.", emoji: "🌅" },
+            { text: "Tu amor es el hilo que conecta todos los días de mi vida.", emoji: "🧵" },
+            { text: "Gracias por ser honesto, cariñoso y siempre tú.", emoji: "💛" },
+            { text: "Eres el amor que elige quedarse.", emoji: "🌳" },
+            { text: "Tu amor ilumina todos los rincones oscuros.", emoji: "🔦" },
+            { text: "Contigo no necesito perfección, solo necesito este amor.", emoji: "🌼" },
+            { text: "Eres la persona que me hace sentir visto y comprendido.", emoji: "🫂" },
+            { text: "Tu amor es el más bonito de todos los amores.", emoji: "💐" },
+            { text: "Gracias por hacer que cada día valga la pena ser vivido.", emoji: "🌻" },
+            { text: "Eres mi compañero favorito en este viaje llamado vida.", emoji: "✈️" },
+            { text: "Tu amor es constante como el latir de mi corazón.", emoji: "❤️" },
+            { text: "Contigo incluso los días difíciles tienen algo de magia.", emoji: "🪄" },
+            { text: "Eres la persona que convierte lo simple en extraordinario.", emoji: "✨" },
+            { text: "Tu amor es el más bonito regalo que me ha dado existir.", emoji: "🎁" },
+            { text: "Gracias por ser mi apoyo en cada caída y mi aplauso en cada logro.", emoji: "👏" },
+            { text: "Eres la persona por quien vale la pena ser valiente.", emoji: "🦋" },
+            { text: "Tu amor es la cosa más linda que tengo.", emoji: "🌹" },
+            { text: "Contigo la distancia no existe porque siempre estás en mi corazón.", emoji: "💓" },
+            { text: "Eres la persona que mi corazón llama hogar.", emoji: "🏠" },
+            { text: "Tu amor me enseñó que la felicidad no se busca, se construye.", emoji: "🏗️" },
+            { text: "Gracias por hacer que creer en el amor sea fácil.", emoji: "🌟" },
+            { text: "Eres el motivo más hermoso de todos mis días.", emoji: "☀️" },
+            { text: "Tu amor es mi ancla y mis alas al mismo tiempo.", emoji: "⚓🕊️" },
+            { text: "Contigo aprendí que el amor verdadero es libre y tranquilo.", emoji: "🌿" },
+            { text: "Eres la persona más importante de mi historia.", emoji: "📖" },
+            { text: "Tu amor es lo que me hace seguir adelante.", emoji: "💪" },
+            { text: "Gracias por amarme sin condiciones.", emoji: "♾️" },
+            { text: "Eres la razón por la que cada mañana tiene sentido.", emoji: "🌄" },
+            { text: "Tu amor es mi favorito de todos los amores que existen.", emoji: "💝" },
+            { text: "Contigo descubrí que ser feliz es una decisión que se toma juntos.", emoji: "🤝" },
+            { text: "Eres la persona que me hace sentir que todo está bien.", emoji: "🌊" },
+            { text: "Tu amor es poesía viva.", emoji: "📜" },
+            { text: "Gracias por ser mi luz en los días que no encuentro la mía.", emoji: "🕯️" },
+            { text: "Eres el tipo de amor que te cambia para siempre.", emoji: "🔄" },
+            { text: "Tu amor es lo que hace brillar cada día ordinario.", emoji: "💫" },
+            { text: "Contigo soy la mejor versión de mí mismo.", emoji: "🌱" },
+            { text: "Eres la persona que más admiro en el mundo.", emoji: "🌠" },
+            { text: "Tu amor es lo que me hace confiar en la vida.", emoji: "🙏" },
+            { text: "Gracias por existir y por dejarme amarte.", emoji: "💖" },
+            { text: "Eres el amor de mi vida y lo sabes muy bien.", emoji: "💘" },
+            { text: "Tu amor me llenó todos los espacios que tenía vacíos.", emoji: "🌸" },
+            { text: "Contigo aprendí que el amor más bonito es el que nunca deja de crecer.", emoji: "🌻" },
+            { text: "Eres todo lo que pedí al universo cuando no sabía cómo pedirlo.", emoji: "🌌" },
+            { text: "Tu amor es el más bonito poema que he vivido.", emoji: "🎭" },
+            { text: "Gracias por hacer de nuestra historia algo que vale la pena contar.", emoji: "📚" },
+            { text: "Eres la persona que le da color a todos mis días.", emoji: "🎨" },
+            { text: "Tu amor es lo más real que he sentido en toda mi vida.", emoji: "💯" },
+            { text: "Contigo cada día es un nuevo motivo para enamorarme más.", emoji: "💑" },
+            { text: "Eres la persona que me recuerda por qué vale la pena estar vivo.", emoji: "🌅" },
+            { text: "Tu amor es infinito como el cielo y profundo como el mar.", emoji: "🌊" },
+            { text: "Gracias por ser constante en este amor que crecemos juntos.", emoji: "🌿" },
+            { text: "Eres la persona que me hace sentir que no estoy solo jamás.", emoji: "🤗" },
+            { text: "Tu amor es mi lugar favorito en el mundo.", emoji: "🏡" },
+            { text: "Contigo aprendí que amar es también escuchar con el corazón.", emoji: "👂" },
+            { text: "Eres la persona más bonita que ha pasado por mi vida.", emoji: "🌺" },
+            { text: "Tu amor es la razón por la que creo en las segundas oportunidades.", emoji: "🔄" },
+            { text: "Gracias por ser mi compañero de vida, hoy y siempre.", emoji: "💞" },
+            { text: "Eres la persona con quien quiero compartir todos mis sueños.", emoji: "💭" },
+            { text: "Tu amor me hizo entender que merezco algo bueno.", emoji: "🌟" },
+            { text: "Contigo cualquier lugar del mundo se convierte en mi lugar favorito.", emoji: "📍" },
+            { text: "Eres el amor que llega para quedarse.", emoji: "🌳" },
+            { text: "Tu amor es el más bonito de mis recuerdos.", emoji: "📸" },
+            { text: "Gracias por caminar a mi lado en cada paso de este viaje.", emoji: "👣" },
+            { text: "Eres la persona que le da sentido a todas mis palabras.", emoji: "🖊️" },
+            { text: "Tu amor es lo mejor que me ha pasado.", emoji: "🎊" },
+            { text: "Contigo aprendí que el amor auténtico transforma.", emoji: "🦋" },
+            { text: "Eres la persona con quien quiero celebrar cada pequeño triunfo.", emoji: "🥂" },
+            { text: "Tu amor es lo que me da fuerza cuando más la necesito.", emoji: "💪" },
+            { text: "Gracias por ser mi compañero de risas y de sueños.", emoji: "😊" },
+            { text: "Eres la persona que más quiero en este y en todos los mundos posibles.", emoji: "🌍" },
+            { text: "Tu amor es mi mayor certeza en un mundo lleno de dudas.", emoji: "⚓" },
+            { text: "Contigo cada día tiene algo especial que atesorar.", emoji: "💎" },
+            { text: "Eres la persona que hace que la vida sea verdaderamente bonita.", emoji: "🌈" },
+            { text: "Tu amor es el más puro y el más real que conozco.", emoji: "🤍" },
+            { text: "Gracias por amar todas las partes de mí, incluso las que yo no amaba.", emoji: "🫶" },
+            { text: "Eres la persona por quien el tiempo siempre vale la pena.", emoji: "⌛" },
+            { text: "Tu amor es lo que completa todo lo que soy.", emoji: "🧩" },
+            { text: "Contigo aprendí que el amor más hermoso es el que no necesita palabras.", emoji: "🤫" },
+            { text: "Eres la persona que hace que mi corazón lata diferente.", emoji: "💓" },
+            { text: "Tu amor es el más grande tesoro de mi vida.", emoji: "🏆" },
+            { text: "Gracias por ser la razón de mis mejores sonrisas.", emoji: "😄" },
+            { text: "Eres la persona que me hizo creer en el amor para siempre.", emoji: "♾️" },
+            { text: "Tu amor es como el fuego: cálido, vivo y necesario.", emoji: "🔥" },
+            { text: "Contigo soy libre, feliz y completamente yo.", emoji: "🕊️" },
+            { text: "Eres mi persona favorita, en todos los sentidos.", emoji: "💑" },
+            { text: "Tu amor lo es todo para mí.", emoji: "🌹" },
+            { text: "Gracias por ser la constante más hermosa de mi vida.", emoji: "🌟" },
+            { text: "Eres la persona que más me llena el corazón.", emoji: "💗" },
+            { text: "Tu amor es la razón por la que agradezco existir.", emoji: "🙌" },
+            { text: "Contigo aprendí que el amor más bonito llega cuando menos lo esperas.", emoji: "🎁" },
+            { text: "Eres la persona que eligió amarme y eso lo cambia todo.", emoji: "💖" },
+            { text: "Tu amor es mi historia favorita.", emoji: "📖" },
+            { text: "Gracias por hacer que cada día contigo sea memorable.", emoji: "📅" },
+            { text: "Eres la persona que convierte mis miedos en fortaleza.", emoji: "🛡️" },
+            { text: "Tu amor es el regalo más grande que me ha dado la vida.", emoji: "🎀" },
+            { text: "Contigo no quiero que se acabe ningún día.", emoji: "🌙" },
+            { text: "Eres la persona que me enseñó a amar con todo el corazón.", emoji: "❤️‍🔥" },
+            { text: "Tu amor es mi paz, mi alegría y mi hogar.", emoji: "🏡" },
+            { text: "Gracias por ser tan increíblemente tú.", emoji: "⭐" },
+            { text: "Eres la persona que más amo en todo el universo.", emoji: "🌌" },
+            { text: "Tu amor es todo lo que mi corazón necesita.", emoji: "💝" },
+            { text: "Contigo la vida tiene un significado completamente diferente.", emoji: "✨" },
+            { text: "Eres mi razón más bonita para seguir adelante.", emoji: "🌄" },
+            { text: "Tu amor me llena de gratitud cada día.", emoji: "🙏" },
+            { text: "Gracias por ser mi compañero favorito en esta vida.", emoji: "💫" },
+            { text: "Eres la persona que me hizo creer que el amor de verdad existe.", emoji: "💘" },
+            { text: "Tu amor es lo más bonito que he recibido jamás.", emoji: "🌸" },
+            { text: "Contigo cada día es una página nueva de nuestra historia.", emoji: "📝" },
+            { text: "Eres la persona que siempre quiero tener cerca.", emoji: "🤗" },
+            { text: "Tu amor es mi motivación más grande.", emoji: "🏃" },
+            { text: "Gracias por ser tan especial y por dejarme ser parte de tu vida.", emoji: "💞" },
+            { text: "Eres la persona que me hace sentir que pertenezco.", emoji: "🌿" },
+            { text: "Tu amor es lo más bonito de todos mis días.", emoji: "🌻" },
+            { text: "Contigo aprendí que el amor es también un acto de valentía.", emoji: "🦁" },
+            { text: "Eres el amor que siempre soñé y nunca imaginé merecer.", emoji: "💍" },
+            { text: "Tu amor es la cosa más bonita que me ha pasado en la vida.", emoji: "🌹" },
+            { text: "Gracias por ser el amor de mi vida.", emoji: "💖" },
+            { text: "Eres la persona con quien quiero llegar a viejito.", emoji: "👴❤️👵" },
+            { text: "Tu amor me hace sentir invencible.", emoji: "🦸" },
+            { text: "Contigo no necesito nada más en este mundo.", emoji: "🌍" },
+            { text: "Eres mi mayor bendición y mi amor más profundo.", emoji: "🙌" },
+            { text: "Tu amor es lo que hace que todo brille.", emoji: "✨" },
+            { text: "Gracias por ser tú, por amarme, por quedarte.", emoji: "❤️" },
+            { text: "Eres la persona que cambia todo con solo estar presente.", emoji: "🌟" },
+            { text: "Tu amor es eterno, y eso lo siento en lo más profundo de mi ser.", emoji: "♾️" },
+            { text: "Contigo encontré el amor que no sabe de límites ni de distancias.", emoji: "🌊" },
+            { text: "Eres la persona que tiene mi corazón, hoy y siempre.", emoji: "💓" },
+            { text: "Tu amor es mi historia más bonita, mi aventura más grande.", emoji: "🗺️" },
+            { text: "Gracias por enseñarme que el amor verdadero transforma todo.", emoji: "🦋" },
+            { text: "Eres la persona que más quiero y más necesito en este mundo.", emoji: "🌺" },
+            { text: "Tu amor es lo que me da sentido.", emoji: "🔮" },
+            { text: "Contigo aprendí que el amor más real es el que crece en silencio.", emoji: "🌱" },
+            { text: "Eres todo lo que quiero y todo lo que necesito.", emoji: "💎" },
+            { text: "Tu amor es la promesa más bonita que me han hecho.", emoji: "🤞" },
+            { text: "Gracias por amarme tan bien.", emoji: "🫶" },
+            { text: "Eres la persona que más valoro en toda mi vida.", emoji: "🏅" },
+            { text: "Tu amor es lo que hace que cada día merezca ser vivido.", emoji: "☀️" },
+            { text: "Contigo el amor es sencillo, real y profundo.", emoji: "🕊️" },
+            { text: "Eres mi razón favorita para creer que todo pasa por algo.", emoji: "🌠" },
+            { text: "Tu amor es el más bonito regalo del universo.", emoji: "🎁" },
+            { text: "Gracias por estar siempre, en las buenas y en las no tan buenas.", emoji: "🌧️☀️" },
+            { text: "Eres la persona que más extraño cuando no estás.", emoji: "💭" },
+            { text: "Tu amor es lo más grande y lo más bonito que conozco.", emoji: "🌌" },
+            { text: "Contigo aprendí que amar es la decisión más valiente.", emoji: "💪" },
+            { text: "Eres la persona que siempre quiero elegir.", emoji: "🔁" },
+            { text: "Tu amor es la razón de mi felicidad más profunda.", emoji: "😊" },
+            { text: "Gracias por hacer de nuestra historia algo único e irrepetible.", emoji: "✨" },
+            { text: "Eres la persona que me completa de una manera que no sabía que era posible.", emoji: "🧩" },
+            { text: "Tu amor es lo que me hace volver a casa sin importar dónde esté.", emoji: "🏡" },
+            { text: "Contigo cada momento es especial, cada instante vale todo.", emoji: "⌛" },
+            { text: "Eres mi persona, mi amor, mi todo.", emoji: "💖" },
+            { text: "Tu amor es la constante más hermosa de mi vida y de mi historia.", emoji: "📖" },
+            { text: "Gracias por amarme. Hoy, mañana, siempre.", emoji: "♾️" },
+            { text: "Eres mi favorito en todas las formas posibles.", emoji: "🌟" },
+            { text: "Tu amor es lo que hace brillar incluso los días más grises.", emoji: "🌤️" },
+            { text: "Contigo descubrí lo que es amar de verdad, sin miedo y sin límites.", emoji: "❤️‍🔥" },
+            { text: "Eres la persona más importante que ha entrado a mi vida.", emoji: "💫" },
+            { text: "Tu amor es lo más bonito que tengo.", emoji: "🌹" },
+            { text: "Gracias por este año increíble. Pronto cumplimos nuestro primer aniversario juntos.", emoji: "🎉" },
+            // ═════════════════════════════════════════════════════════════════
+            // 🎊 PÁGINA ESPECIAL DE ANIVERSARIO — Día 365 (13 de diciembre 2025)
+            // Esta página aparece exactamente en su primer aniversario
+            // ═════════════════════════════════════════════════════════════════
+            { text: "¡UN AÑO JUNTOS! 🎊 Hace exactamente 365 días empezó la mejor historia de mi vida. Gracias por cada día, cada sonrisa, cada abrazo. Te amo hoy más que nunca, y mañana te amaré más que hoy. Feliz primer aniversario, amor mío. ♾️", emoji: "🎊", isAnniversary: true },
+        ];
+
+        // ═══════════════════════════════════════════
+        // STATE
+        // ═══════════════════════════════════════════
+        let isOpen = false;
+        let currentPage = 0; // 0-indexed, which page pair we're on
+        let totalDays = 0;
+        let pages = []; // DOM page elements
+        let flipping = false;
+
+        // ═══════════════════════════════════════════
+        // DAYS CALC
+        // ═══════════════════════════════════════════
+        function getDaysDiff() {
+            const now = new Date();
+            const diff = now - ANNIVERSARY;
+            return Math.max(0, Math.floor(diff / (1000 * 60 * 60 * 24)));
+        }
+
+        function getPageFrase(dayIndex) {
+            return frases[dayIndex % frases.length];
+        }
+
+        function formatDate(dayIndex) {
+            const d = new Date(ANNIVERSARY);
+            d.setDate(d.getDate() + dayIndex);
+            return d.toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' });
+        }
+
+        // ═══════════════════════════════════════════
+        // BUILD PAGES
+        // ═══════════════════════════════════════════
+        function buildPages() {
+            totalDays = getDaysDiff();
+            const stack = document.getElementById('pages-stack');
+            stack.innerHTML = '';
+            pages = [];
+
+            const pageCount = Math.max(1, totalDays + 1);
+
+            for (let i = pageCount - 1; i >= 0; i--) {
+                const isToday = i === totalDays;
+                // Day 365 = anniversary (index 365 in frases)
+                const isAnniversary = i === 365;
+                const frase = frases[Math.min(i, frases.length - 1)];
+                const dateStr = formatDate(i);
+
+                const page = document.createElement('div');
+                page.className = 'page';
+                page.style.zIndex = pageCount - i;
+                page.dataset.index = i;
+
+                const dayLabel = i === 0 ? 'Día 1 · El primero' : isAnniversary ? '🎊 ¡1 Año Juntos!' : `Día ${i + 1}`;
+
+                if (isAnniversary) {
+                    page.innerHTML = `
+        <div class="page-front" style="background:linear-gradient(135deg,#fff0f8,#fde8f0);position:relative;overflow:hidden;">
+          <div style="position:absolute;inset:0;background:repeating-linear-gradient(transparent,transparent 30px,rgba(232,160,180,0.12) 30px,rgba(232,160,180,0.12) 31px);border-radius:0 10px 10px 0;pointer-events:none;"></div>
+          <div class="today-badge" style="background:linear-gradient(90deg,#c2678a,#d4a76a);font-size:0.8rem;padding:6px 18px;">🎊 ¡Feliz Aniversario! 🎊</div>
+          <div class="page-day" style="font-size:0.9rem;color:var(--gold);">✦ Un año de amor ✦</div>
+          <div class="page-ornament" style="background:linear-gradient(90deg,transparent,var(--gold),transparent);"></div>
+          <div class="page-quote" style="font-size:1rem;line-height:1.65;">${frase.text}</div>
+          <div class="page-heart-deco" style="font-size:2rem;">🎊💖🎊</div>
+          <div class="page-date-small">${dateStr}</div>
+          <div class="page-ornament" style="background:linear-gradient(90deg,transparent,var(--gold),transparent);"></div>
+          <div class="page-number" style="right:18px;color:var(--gold);">Pág. 365</div>
+        </div>
+        <div class="page-back" style="background:linear-gradient(135deg,#fdf5f8,#fff0f8);">
+          <div class="page-ornament"></div>
+          <div style="font-size:2rem;margin-bottom:8px;">💍</div>
+          <div class="page-quote" style="font-size:0.95rem;font-style:italic;color:var(--rose-deep);">Gracias por este primer año.<br>El mejor está por venir. 💖</div>
+          <div class="page-ornament"></div>
+          <div class="page-number" style="left:18px;">Pág. 366</div>
+        </div>
+      `;
+                } else {
+                    page.innerHTML = `
+        <div class="page-front">
+          ${isToday ? '<div class="today-badge">✦ Hoy ✦</div>' : ''}
+          <div class="page-day">${dayLabel}</div>
+          <div class="page-ornament"></div>
+          <div class="page-quote">${frase.text}</div>
+          <div class="page-heart-deco">${frase.emoji}</div>
+          <div class="page-date-small">${dateStr}</div>
+          <div class="page-ornament"></div>
+          <div class="page-number">Pág. ${(i + 1) * 2 - 1}</div>
+        </div>
+        <div class="page-back">
+          <div class="page-day" style="opacity:0.5">~</div>
+          <div class="page-ornament"></div>
+          <div class="page-quote" style="font-size:1.5rem">${frase.emoji}</div>
+          <div class="page-date-small" style="margin-top:6px;font-style:italic">Con amor, siempre</div>
+          <div class="page-ornament"></div>
+          <div class="page-number">Pág. ${(i + 1) * 2}</div>
+        </div>
+      `;
+                }
+
+                stack.appendChild(page);
+                pages.unshift(page);
+            }
+        }
+
+        // ═══════════════════════════════════════════
+        // PAGE FLIP LOGIC
+        // ═══════════════════════════════════════════
+        function updatePageIndicator() {
+            const total = pages.length;
+            const cur = total - currentPage; // pages left to flip
+            document.getElementById('page-indicator').textContent = `${currentPage + 1} / ${total}`;
+            document.getElementById('prev-btn').disabled = currentPage <= 0;
+            document.getElementById('next-btn').disabled = currentPage >= total - 1;
+        }
+
+        function goToPage(index) {
+            if (flipping) return;
+            if (index < 0 || index >= pages.length) return;
+
+            flipping = true;
+            const indicator = document.getElementById('flip-indicator');
+            indicator.classList.add('show');
+
+            if (index > currentPage) {
+                // flip forward: flip pages from currentPage up to index
+                const doFlip = (i) => {
+                    if (i > index) {
+                        currentPage = index;
+                        updatePageIndicator();
+                        flipping = false;
+                        indicator.classList.remove('show');
+                        spawnSparkles();
+                        return;
+                    }
+                    pages[i].classList.add('flipped');
+                    setTimeout(() => doFlip(i + 1), 180);
+                };
+                doFlip(currentPage);
+            } else {
+                // flip backward
+                const doUnflip = (i) => {
+                    if (i < index) {
+                        currentPage = index;
+                        updatePageIndicator();
+                        flipping = false;
+                        indicator.classList.remove('show');
+                        spawnSparkles();
+                        return;
+                    }
+                    pages[i].classList.remove('flipped');
+                    setTimeout(() => doUnflip(i - 1), 180);
+                };
+                doUnflip(currentPage - 1);
+            }
+        }
+
+        function nextPage() {
+            if (currentPage < pages.length - 1) {
+                spawnFloatingHeart();
+                goToPage(currentPage + 1);
+            }
+        }
+
+        function prevPage() {
+            if (currentPage > 0) {
+                goToPage(currentPage - 1);
+            }
+        }
+
+        // ═══════════════════════════════════════════
+        // OPEN BOOK
+        // ═══════════════════════════════════════════
+        function openBook() {
+            if (isOpen) return;
+            isOpen = true;
+            document.getElementById('book-cover').classList.add('open');
+            document.getElementById('nav-area').style.display = 'flex';
+
+            // 🎵 Iniciar música al abrir el libro
+            const music = document.getElementById('bg-music');
+            music.src = MUSIC_FILE;
+            music.play().catch(() => { }); // catch por políticas de autoplay del navegador
+
+            setTimeout(() => {
+                goToPage(totalDays);
+                spawnConfetti();
+            }, 1300);
+        }
+
+        // ═══════════════════════════════════════════
+        // COUNTER
+        // ═══════════════════════════════════════════
+        function updateCounter() {
+            const now = new Date();
+            const diff = now - ANNIVERSARY;
+            if (diff < 0) {
+                document.getElementById('days-count').textContent = '0';
+                document.getElementById('hms').textContent = '00h 00m 00s';
+                return;
+            }
+            const days = Math.floor(diff / 86400000);
+            const h = Math.floor((diff % 86400000) / 3600000);
+            const m = Math.floor((diff % 3600000) / 60000);
+            const s = Math.floor((diff % 60000) / 1000);
+            document.getElementById('days-count').textContent = days;
+            document.getElementById('hms').textContent =
+                `${String(h).padStart(2, '0')}h ${String(m).padStart(2, '0')}m ${String(s).padStart(2, '0')}s`;
+        }
+
+        // ═══════════════════════════════════════════
+        // PARTICLES
+        // ═══════════════════════════════════════════
+        const canvas = document.getElementById('particles-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function createParticle() {
+            return {
+                x: Math.random() * canvas.width,
+                y: canvas.height + 10,
+                size: Math.random() * 7 + 3,
+                speedX: (Math.random() - 0.5) * 0.8,
+                speedY: -(Math.random() * 1.2 + 0.4),
+                opacity: Math.random() * 0.5 + 0.3,
+                type: Math.random() > 0.5 ? 'heart' : 'dot',
+                rot: Math.random() * Math.PI * 2,
+                rotSpeed: (Math.random() - 0.5) * 0.03,
+            };
+        }
+
+        function drawHeart(ctx, x, y, size, opacity) {
+            ctx.save();
+            ctx.globalAlpha = opacity;
+            ctx.fillStyle = `hsl(${330 + Math.random() * 30}, 80%, 75%)`;
+            ctx.translate(x, y);
+            ctx.beginPath();
+            ctx.moveTo(0, -size * 0.3);
+            ctx.bezierCurveTo(size * 0.5, -size, size * 1.2, -size * 0.2, 0, size * 0.6);
+            ctx.bezierCurveTo(-size * 1.2, -size * 0.2, -size * 0.5, -size, 0, -size * 0.3);
+            ctx.fill();
+            ctx.restore();
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (particles.length < 30 && Math.random() < 0.15) {
+                particles.push(createParticle());
+            }
+
+            particles = particles.filter(p => p.opacity > 0.01 && p.y > -20);
+
+            for (const p of particles) {
+                p.x += p.speedX;
+                p.y += p.speedY;
+                p.rot += p.rotSpeed;
+                p.opacity -= 0.003;
+
+                ctx.save();
+                ctx.translate(p.x, p.y);
+                ctx.rotate(p.rot);
+                if (p.type === 'heart') {
+                    drawHeart(ctx, 0, 0, p.size, p.opacity);
+                } else {
+                    ctx.globalAlpha = p.opacity;
+                    ctx.fillStyle = '#e8a0b4';
+                    ctx.beginPath();
+                    ctx.arc(0, 0, p.size / 2, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                ctx.restore();
+            }
+
+            requestAnimationFrame(animateParticles);
+        }
+
+        // ═══════════════════════════════════════════
+        // EFFECTS
+        // ═══════════════════════════════════════════
+        function spawnConfetti() {
+            const colors = ['#e8a0b4', '#c2678a', '#d4a76a', '#f4e0ea', '#f48fb1'];
+            for (let i = 0; i < 40; i++) {
+                setTimeout(() => {
+                    const el = document.createElement('div');
+                    el.className = 'confetti-piece';
+                    el.style.left = Math.random() * 100 + 'vw';
+                    el.style.top = '-10px';
+                    el.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    el.style.transform = `rotate(${Math.random() * 360}deg)`;
+                    el.style.animationDuration = (Math.random() * 1.5 + 1.2) + 's';
+                    document.body.appendChild(el);
+                    setTimeout(() => el.remove(), 3000);
+                }, i * 40);
+            }
+        }
+
+        function spawnSparkles() {
+            const cx = window.innerWidth / 2;
+            const cy = window.innerHeight / 2;
+            for (let i = 0; i < 6; i++) {
+                const el = document.createElement('div');
+                el.className = 'sparkle';
+                el.style.left = (cx + (Math.random() - 0.5) * 200) + 'px';
+                el.style.top = (cy + (Math.random() - 0.5) * 200) + 'px';
+                el.style.animationDelay = (i * 80) + 'ms';
+                document.body.appendChild(el);
+                setTimeout(() => el.remove(), 1200);
+            }
+        }
+
+        function spawnFloatingHeart() {
+            const hearts = ['💖', '💗', '💕', '💓', '🌹', '✨'];
+            const el = document.createElement('div');
+            el.className = 'float-heart';
+            el.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+            el.style.left = (30 + Math.random() * 40) + 'vw';
+            el.style.bottom = '20vh';
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 3000);
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (!isOpen) return;
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown') nextPage();
+            if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') prevPage();
+        });
+
+        // Swipe support
+        let touchStartX = 0;
+        document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
+        document.addEventListener('touchend', (e) => {
+            if (!isOpen) return;
+            const dx = e.changedTouches[0].clientX - touchStartX;
+            if (dx < -50) nextPage();
+            if (dx > 50) prevPage();
+        });
+
+        // ═══════════════════════════════════════════
+        // INIT
+        // ═══════════════════════════════════════════
+        buildPages();
+        updateCounter();
+        setInterval(updateCounter, 1000);
+        animateParticles();
+    </script>
+</body>
+
+</html>
