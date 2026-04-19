@@ -26,7 +26,6 @@
 
   #particles-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
 
-  /* COUNTER ORIGINAL */
   .counter-box {
     position: relative; z-index: 10; background: rgba(255,255,255,0.55);
     backdrop-filter: blur(12px); border: 1px solid rgba(232,160,180,0.5);
@@ -36,7 +35,6 @@
   }
   .counter-box span { color: var(--rose-deep); font-weight: 700; font-family: 'Playfair Display', serif; }
 
-  /* ESCENA DEL LIBRO */
   .book-scene {
     position: relative; z-index: 10; perspective: 2000px;
     width: min(380px, 90vw); height: min(480px, 70vh);
@@ -74,7 +72,6 @@
   .quote { font-size: 1.2rem; font-style: italic; color: var(--ink); line-height: 1.5; margin-bottom: 15px; }
   .author { font-size: 0.75rem; color: var(--rose-deep); letter-spacing: 2px; text-transform: uppercase; font-weight: bold; }
 
-  /* UI DE MÚSICA REFORZADA */
   .music-ui {
     position: fixed; bottom: 25px; right: 25px; z-index: 1000;
     display: flex; align-items: center; gap: 12px;
@@ -85,7 +82,6 @@
   .m-btn { background: none; border: none; cursor: pointer; font-size: 1.3rem; color: var(--rose-deep); transition: 0.2s; }
   .m-btn:hover { transform: scale(1.2); }
   #track-name { font-size: 0.65rem; color: var(--rose-deep); font-weight: bold; min-width: 80px; text-align: center; text-transform: uppercase; }
-
 </style>
 </head>
 <body>
@@ -128,7 +124,16 @@
   </div>
 </div>
 
-<iframe id="sc-widget" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/114946051&auto_play=false" style="display:none"></iframe>
+<!-- ═══════════════════════════════════════════════════════════════
+     🎵 MÚSICA — El iframe debe ser pequeño y fuera de pantalla,
+     NUNCA display:none porque el navegador bloquea el audio.
+     Para cambiar la canción 1, reemplaza la URL del src.
+     ═══════════════════════════════════════════════════════════════ -->
+<iframe id="sc-widget"
+  src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/kevin-brian-2/the-reason-hoobastank&auto_play=false&hide_related=true&show_comments=false&show_user=false"
+  style="position:fixed;bottom:-300px;left:0;width:1px;height:1px;opacity:0;pointer-events:none;"
+  allow="autoplay">
+</iframe>
 
 <div class="music-ui">
   <button class="m-btn" onclick="prevTrack()">⏮</button>
@@ -138,19 +143,27 @@
 </div>
 
 <script>
-  // CONFIGURACIÓN DE AUDIO
+  // ═══════════════════════════════════════════════════════════════
+  // 🎵 CANCIONES — Cambia los links de SoundCloud aquí.
+  //    Deben ser URLs públicas de soundcloud.com (no api.soundcloud.com)
+  // ═══════════════════════════════════════════════════════════════
   const tracks = [
-    { name: "THE REASON", url: "https://api.soundcloud.com/tracks/114946051" },
-    { name: "WONDERWALL", url: "https://api.soundcloud.com/tracks/10292723" }
+    { name: "THE REASON",  url: "https://soundcloud.com/kevin-brian-2/the-reason-hoobastank" },
+    { name: "WONDERWALL",  url: "https://soundcloud.com/emre-serce/oasis-wonderwall" }
   ];
+
   let currentIdx = 0;
-  const widget = SC.Widget(document.getElementById('sc-widget'));
   let playing = false;
+  const widget = SC.Widget(document.getElementById('sc-widget'));
+
+  // Esperar a que el widget esté listo antes de usarlo
+  widget.bind(SC.Widget.Events.READY, function() {
+    console.log('Widget listo');
+  });
 
   function startExperience(cover) {
     cover.classList.add('flipped');
-    // Forzamos play inicial al abrir el libro
-    if(!playing) {
+    if (!playing) {
       widget.play();
       playing = true;
       document.getElementById('play-pause').innerText = "🎵";
@@ -158,9 +171,14 @@
   }
 
   function toggleMusic() {
-    widget.toggle();
+    if (playing) {
+      widget.pause();
+      document.getElementById('play-pause').innerText = "🔇";
+    } else {
+      widget.play();
+      document.getElementById('play-pause').innerText = "🎵";
+    }
     playing = !playing;
-    document.getElementById('play-pause').innerText = playing ? "🎵" : "🔇";
   }
 
   function nextTrack() {
@@ -180,7 +198,7 @@
     document.getElementById('play-pause').innerText = "🎵";
   }
 
-  // CONTADOR Y PARTÍCULAS (Originales)
+  // CONTADOR
   const ANNIVERSARY = new Date("2024-12-13T00:00:00");
   function updateCounter() {
     const diff = new Date() - ANNIVERSARY;
@@ -191,20 +209,28 @@
     document.getElementById('days-count').textContent = days;
     document.getElementById('hms').textContent = `${String(h).padStart(2,'0')}h ${String(m).padStart(2,'0')}m ${String(s).padStart(2,'0')}s`;
   }
-  setInterval(updateCounter, 1000); updateCounter();
+  setInterval(updateCounter, 1000);
+  updateCounter();
 
+  // PARTÍCULAS
   const canvas = document.getElementById('particles-canvas');
   const ctx = canvas.getContext('2d');
-  canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
   let particles = [];
   function animate() {
-    ctx.clearRect(0,0,canvas.width, canvas.height);
-    if(particles.length < 25 && Math.random() < 0.1) particles.push({ x: Math.random()*canvas.width, y: canvas.height+10, speedY: -(Math.random()*0.5+0.2), opacity: 0.6 });
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (particles.length < 25 && Math.random() < 0.1) {
+      particles.push({ x: Math.random() * canvas.width, y: canvas.height + 10, speedY: -(Math.random() * 0.5 + 0.2), opacity: 0.6 });
+    }
     particles.forEach((p, i) => {
-      p.y += p.speedY; p.opacity -= 0.0015;
+      p.y += p.speedY;
+      p.opacity -= 0.0015;
       ctx.fillStyle = `rgba(232, 160, 180, ${p.opacity})`;
-      ctx.beginPath(); ctx.arc(p.x, p.y, 2, 0, Math.PI*2); ctx.fill();
-      if(p.opacity <= 0) particles.splice(i, 1);
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+      ctx.fill();
+      if (p.opacity <= 0) particles.splice(i, 1);
     });
     requestAnimationFrame(animate);
   }
