@@ -4,248 +4,196 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Para Ti 💖</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
-<script src="https://w.soundcloud.com/player/api.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Cormorant+Garamond:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
 <style>
   :root {
-    --rose: #e8a0b4;
     --rose-deep: #c2678a;
     --parchment: #fef9f2;
     --ink: #3a2a35;
-    --gold: #d4a76a;
   }
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
   body {
-    min-height: 100vh;
-    background: radial-gradient(ellipse at 30% 20%, #fce4ec 0%, #f8bbd0 30%, #f48fb1 60%, #e91e8c22 100%);
+    margin: 0;
+    height: 100vh;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
+    background: #f8bbd0;
     font-family: 'Cormorant Garamond', serif;
     overflow: hidden;
   }
 
-  /* OPTIMIZACIÓN: Solo animamos lo necesario */
-  .book-scene {
+  /* CONTENEDOR DEL LIBRO */
+  .book-container {
     position: relative;
-    z-index: 10;
-    perspective: 1800px;
-    width: min(380px, 90vw);
-    height: min(480px, 70vh);
+    width: 320px;
+    height: 450px;
+    perspective: 1500px;
   }
 
   .book {
-    width: 100%; height: 100%;
+    width: 100%;
+    height: 100%;
     position: relative;
     transform-style: preserve-3d;
+    transition: transform 0.5s;
   }
 
+  /* ESTILO DE CADA PÁGINA */
   .page {
     position: absolute;
-    width: 100%; height: 100%;
+    width: 100%;
+    height: 100%;
     top: 0; left: 0;
     background: var(--parchment);
-    border-radius: 0 10px 10px 0;
     transform-origin: left center;
     transition: transform 0.8s cubic-bezier(0.645, 0.045, 0.355, 1);
-    will-change: transform; /* Mejora el rendimiento */
-    backface-visibility: hidden;
+    transform-style: preserve-3d;
     cursor: pointer;
-    box-shadow: inset 3px 0 10px rgba(0,0,0,0.1);
-  }
-
-  .page.flipped { transform: rotateY(-180deg); }
-
-  .page-front, .page-back {
-    position: absolute;
-    width: 100%; height: 100%;
+    box-shadow: inset 3px 0 10px rgba(0,0,0,0.1), 5px 5px 15px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
     padding: 30px;
+    box-sizing: border-box;
     backface-visibility: hidden;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
+    will-change: transform;
   }
 
-  .page-back { transform: rotateY(180deg); background: #fdf5f8; }
+  .page.flipped {
+    transform: rotateY(-180deg);
+  }
 
-  /* COVER */
-  .book-cover {
-    position: absolute;
-    left: 0; top: 0;
-    width: 100%; height: 100%;
-    background: linear-gradient(135deg, #f4b8cf 0%, #c2678a 100%);
-    border-radius: 0 12px 12px 0;
-    z-index: 100;
-    transform-origin: left center;
-    transition: transform 1.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  /* PORTADA */
+  .cover {
+    background: linear-gradient(135deg, #f4b8cf, #c2678a) !important;
     color: white;
-    box-shadow: 5px 0 15px rgba(0,0,0,0.2);
+    z-index: 100; /* Asegura que la portada esté arriba al inicio */
   }
 
-  .book-cover.open { transform: rotateY(-160deg); pointer-events: none; }
-
-  /* CONTROLES */
-  .nav-area { margin-top: 20px; display: flex; align-items: center; gap: 15px; z-index: 20; }
-  .nav-btn {
-    padding: 10px 20px; border-radius: 20px; border: none;
-    background: white; color: var(--rose-deep); cursor: pointer;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  .page-content {
+    text-align: center;
+    pointer-events: none; /* Para que el clic pase a la página */
   }
 
-  /* BOTÓN MÚSICA - Ajustado para ser visible */
-  #music-btn {
-    position: fixed; bottom: 20px; right: 20px; z-index: 1000;
-    width: 50px; height: 50px; border-radius: 50%;
-    background: white; border: 2px solid var(--rose-deep);
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer; font-size: 1.5rem;
+  .quote {
+    font-size: 1.3rem;
+    line-height: 1.4;
+    font-style: italic;
+    color: var(--ink);
   }
 
-  .page-quote { font-size: 1.2rem; font-style: italic; line-height: 1.4; color: var(--ink); }
-  .page-author { font-size: 0.8rem; margin-top: 10px; color: var(--rose-deep); text-transform: uppercase; }
+  .book-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    margin-bottom: 10px;
+  }
 
-  #particles-canvas { position: fixed; top: 0; left: 0; pointer-events: none; }
+  /* BOTÓN DE MÚSICA - FIJO Y SIEMPRE VISIBLE */
+  #music-control {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    z-index: 9999;
+    background: white;
+    border: 2px solid var(--rose-deep);
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 24px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  }
+
+  .author {
+    display: block;
+    margin-top: 15px;
+    font-size: 0.8rem;
+    color: var(--rose-deep);
+    letter-spacing: 2px;
+  }
 </style>
 </head>
 <body>
 
-<canvas id="particles-canvas"></canvas>
+<audio id="bg-music" loop>
+  <source src="https://www.chosic.com/wp-content/uploads/2021/07/The-Reason-Hoobastank-Piano-Version.mp3" type="audio/mpeg">
+</audio>
 
-<div class="book-scene">
-  <div class="book">
-    <div class="book-cover" id="book-cover" onclick="openBook()">
-      <div style="text-align: center; padding: 20px;">
-        <h2 style="font-family:'Playfair Display'">Para Mi Amor</h2>
-        <p>Toca para abrir nuestro mundo</p>
-        <span style="font-size: 2rem;">📖</span>
+<div id="music-control" onclick="toggleMusic()">🎵</div>
+
+<div class="book-container">
+  <div class="book" id="myBook">
+    
+    <div class="page" style="z-index: 1;">
+      <div class="page-content">
+        <p class="quote">"Y así, nuestra historia se escribe un día a la vez."</p>
+        <p>💖</p>
       </div>
     </div>
-    <div id="pages-container"></div>
+
+    <div class="page" onclick="flip(this)" style="z-index: 2;">
+      <div class="page-content">
+        <p class="quote">"Tú me das amor. Pero lo que yo necesito es esa fuerza que me ayude a sobrevivir."</p>
+        <span class="author">LOS JUEGOS DEL HAMBRE</span>
+      </div>
+    </div>
+
+    <div class="page" onclick="flip(this)" style="z-index: 3;">
+      <div class="page-content">
+        <p class="quote">"No quiero que me bajen la luna, quiero que alguien se siente a verla conmigo."</p>
+        <span class="author">HASTA QUE NOS QUEDEMOS SIN ESTRELLAS</span>
+      </div>
+    </div>
+
+    <div class="page" onclick="flip(this)" style="z-index: 4;">
+      <div class="page-content">
+        <p class="quote">"Luke era el sol y yo la luna, y en un mundo perfecto, el eclipse sería eterno."</p>
+        <span class="author">BOULEVARD</span>
+      </div>
+    </div>
+
+    <div class="page cover" onclick="flip(this)" style="z-index: 5;">
+      <div class="page-content">
+        <h1 class="book-title">Nuestro Libro</h1>
+        <p>Para la persona que ilumina mi vida</p>
+        <p style="font-size: 0.8rem; margin-top: 20px;">(Toca para abrir)</p>
+      </div>
+    </div>
+
   </div>
 </div>
 
-<div class="nav-area" id="nav-area" style="display:none">
-  <button class="nav-btn" onclick="prevPage()">Anterior</button>
-  <span id="page-indicator" style="color: var(--rose-deep)">1 / 1</span>
-  <button class="nav-btn" onclick="nextPage()">Siguiente</button>
-</div>
-
-<div id="music-btn" onclick="toggleMusic()">🎵</div>
-
-<iframe id="sc-widget"
-  src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/kevin-brian-2/the-reason-hoobastank&auto_play=false"
-  style="display:none;">
-</iframe>
-
 <script>
-// CONFIGURACIÓN
-const ANNIVERSARY = new Date("2024-12-13");
-const frases = [
-  { text: "Luke era el sol y yo la luna, y en un mundo perfecto, el eclipse sería eterno.", book: "Boulevard" },
-  { text: "No quiero que me bajen la luna, quiero que alguien se siente a verla conmigo.", book: "Hasta que nos quedemos sin estrellas" },
-  { text: "Tú me das amor. Pero lo que yo necesito es esa fuerza que me ayude a sobrevivir.", book: "Los Juegos del Hambre" },
-  { text: "A veces la vida no es un 'vivieron felices para siempre', pero el tiempo juntos valió la pena.", book: "Boulevard" },
-  { text: "Prométeme que pase lo que pase, siempre buscaremos la misma estrella.", book: "Hasta que nos quedemos sin estrellas" },
-  { text: "Te amo. Mucho más que a mi propia vida.", book: "Los Juegos del Hambre" },
-  { text: "Si el mundo se acaba hoy, me gustaría que me encontrara a tu lado.", book: "Boulevard" },
-  { text: "Eres mi caos favorito en este mundo tan ordenado.", book: "Boulevard" }
-];
+  const audio = document.getElementById('bg-music');
+  const btn = document.getElementById('music-control');
+  let isPlaying = false;
 
-let currentPage = 0;
-let isMusicPlaying = false;
-const widget = SC.Widget(document.getElementById('sc-widget'));
-
-// GENERAR PÁGINAS (Limitado para evitar LAG)
-function buildPages() {
-  const container = document.getElementById('pages-container');
-  // Solo generamos las últimas 10 frases o las disponibles para no saturar el DOM
-  frases.forEach((f, i) => {
-    const page = document.createElement('div');
-    page.className = 'page';
-    page.style.zIndex = frases.length - i;
-    page.innerHTML = `
-      <div class="page-front">
-        <p class="page-quote">"${f.text}"</p>
-        <p class="page-author">— ${f.book}</p>
-        <div style="margin-top:20px">💖</div>
-      </div>
-      <div class="page-back">
-        <p>Nuestro camino apenas comienza...</p>
-      </div>
-    `;
-    container.appendChild(page);
-  });
-  updateIndicator();
-}
-
-function openBook() {
-  document.getElementById('book-cover').classList.add('open');
-  document.getElementById('nav-area').style.display = 'flex';
-  if(!isMusicPlaying) toggleMusic();
-}
-
-function nextPage() {
-  const pages = document.querySelectorAll('.page');
-  if (currentPage < pages.length) {
-    pages[currentPage].classList.add('flipped');
-    currentPage++;
-    updateIndicator();
+  // Función para pasar página
+  function flip(page) {
+    page.classList.toggle('flipped');
+    
+    // Si es la portada la que se abre, intentamos poner música
+    if (!isPlaying) {
+      toggleMusic();
+    }
   }
-}
 
-function prevPage() {
-  const pages = document.querySelectorAll('.page');
-  if (currentPage > 0) {
-    currentPage--;
-    pages[currentPage].classList.remove('flipped');
-    updateIndicator();
+  // Control de música corregido
+  function toggleMusic() {
+    if (isPlaying) {
+      audio.pause();
+      btn.innerText = "🔇";
+    } else {
+      audio.play().catch(e => console.log("El navegador bloqueó el autoplay inicial"));
+      btn.innerText = "🎵";
+    }
+    isPlaying = !isPlaying;
   }
-}
-
-function updateIndicator() {
-  document.getElementById('page-indicator').innerText = `${currentPage + 1} / ${frases.length}`;
-}
-
-function toggleMusic() {
-  const btn = document.getElementById('music-btn');
-  if (isMusicPlaying) {
-    widget.pause();
-    btn.innerText = "🔇";
-  } else {
-    widget.play();
-    btn.innerText = "🎵";
-  }
-  isMusicPlaying = !isMusicPlaying;
-}
-
-// Inicialización
-buildPages();
-
-// Partículas simples para no causar lag
-const canvas = document.getElementById('particles-canvas');
-const ctx = canvas.getContext('2d');
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-
-function draw() {
-  ctx.clearRect(0,0,canvas.width, canvas.height);
-  ctx.fillStyle = "rgba(232, 160, 180, 0.3)";
-  for(let i=0; i<20; i++) {
-    ctx.beginPath();
-    ctx.arc(Math.random()*canvas.width, Math.random()*canvas.height, 2, 0, Math.PI*2);
-    ctx.fill();
-  }
-  requestAnimationFrame(draw);
-}
-draw();
 </script>
+
 </body>
 </html>
