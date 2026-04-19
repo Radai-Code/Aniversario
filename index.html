@@ -7,9 +7,11 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Cormorant+Garamond:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
 <style>
   :root {
-    --rose-deep: #c2678a;
-    --parchment: #fef9f2;
-    --ink: #3a2a35;
+    --rose-dark: #884a61;
+    --rose-light: #c2678a;
+    --gold: #d4a76a;
+    --paper: #fef9f2;
+    --ink: #2c2429;
   }
 
   body {
@@ -18,17 +20,17 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #f8bbd0;
+    background: radial-gradient(circle, #fce4ec 0%, #f8bbd0 100%);
     font-family: 'Cormorant Garamond', serif;
     overflow: hidden;
   }
 
-  /* CONTENEDOR DEL LIBRO */
+  /* CONTENEDOR PRINCIPAL */
   .book-container {
     position: relative;
-    width: 320px;
-    height: 450px;
-    perspective: 1500px;
+    width: 340px;
+    height: 480px;
+    perspective: 2000px;
   }
 
   .book {
@@ -36,131 +38,170 @@
     height: 100%;
     position: relative;
     transform-style: preserve-3d;
-    transition: transform 0.5s;
   }
 
-  /* ESTILO DE CADA PÁGINA */
+  /* ESTILO DE LAS PÁGINAS */
   .page {
     position: absolute;
     width: 100%;
     height: 100%;
     top: 0; left: 0;
-    background: var(--parchment);
+    background: var(--paper);
     transform-origin: left center;
-    transition: transform 0.8s cubic-bezier(0.645, 0.045, 0.355, 1);
+    transition: transform 1s cubic-bezier(0.645, 0.045, 0.355, 1);
     transform-style: preserve-3d;
     cursor: pointer;
-    box-shadow: inset 3px 0 10px rgba(0,0,0,0.1), 5px 5px 15px rgba(0,0,0,0.1);
+    box-shadow: 2px 2px 20px rgba(0,0,0,0.1);
+    border-radius: 2px 10px 10px 2px;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 30px;
+    flex-direction: column;
+    padding: 40px 30px;
     box-sizing: border-box;
     backface-visibility: hidden;
-    will-change: transform;
+    border: 1px solid rgba(0,0,0,0.05);
   }
 
+  /* Animación de levantamiento al pasar */
   .page.flipped {
-    transform: rotateY(-180deg);
+    transform: rotateY(-180deg) scale(1.02); /* Escala pequeña para dar profundidad */
+    z-index: 0 !important;
   }
 
-  /* PORTADA */
+  /* Efecto de textura de papel */
+  .page::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(90deg, rgba(0,0,0,0.05) 0%, transparent 10%);
+    pointer-events: none;
+  }
+
+  /* PORTADA ELEGANTE */
   .cover {
-    background: linear-gradient(135deg, #f4b8cf, #c2678a) !important;
+    background: linear-gradient(135deg, #a04e70, #c2678a) !important;
     color: white;
-    z-index: 100; /* Asegura que la portada esté arriba al inicio */
-  }
-
-  .page-content {
-    text-align: center;
-    pointer-events: none; /* Para que el clic pase a la página */
-  }
-
-  .quote {
-    font-size: 1.3rem;
-    line-height: 1.4;
-    font-style: italic;
-    color: var(--ink);
-  }
-
-  .book-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 2rem;
-    margin-bottom: 10px;
-  }
-
-  /* BOTÓN DE MÚSICA - FIJO Y SIEMPRE VISIBLE */
-  #music-control {
-    position: fixed;
-    bottom: 25px;
-    right: 25px;
-    z-index: 9999;
-    background: white;
-    border: 2px solid var(--rose-deep);
-    border-radius: 50%;
-    width: 60px;
-    height: 60px;
+    border: 4px double var(--gold);
     display: flex;
-    align-items: center;
     justify-content: center;
-    cursor: pointer;
-    font-size: 24px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    align-items: center;
+    text-align: center;
+  }
+
+  .cover-border {
+    border: 1px solid var(--gold);
+    height: 90%;
+    width: 85%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+
+  /* TEXTO */
+  .quote {
+    font-size: 1.4rem;
+    line-height: 1.6;
+    color: var(--ink);
+    text-align: center;
+    position: relative;
+  }
+
+  .quote::after {
+    content: '❦';
+    display: block;
+    margin-top: 15px;
+    color: var(--gold);
+    font-size: 1rem;
   }
 
   .author {
-    display: block;
-    margin-top: 15px;
-    font-size: 0.8rem;
-    color: var(--rose-deep);
+    margin-top: 20px;
+    font-size: 0.85rem;
+    color: var(--rose-light);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-weight: bold;
+  }
+
+  /* BOTÓN DE MÚSICA ESTILIZADO */
+  #music-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 1000;
+    width: 55px;
+    height: 55px;
+    background: white;
+    border: 2px solid var(--gold);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    transition: 0.3s;
+  }
+
+  #music-btn:hover { transform: scale(1.1); }
+
+  .music-icon {
+    width: 24px;
+    fill: var(--rose-light);
+  }
+
+  /* INDICADOR DE PÁGINA */
+  .footer-num {
+    position: absolute;
+    bottom: 20px;
+    font-size: 0.7rem;
+    color: var(--gold);
     letter-spacing: 2px;
   }
 </style>
 </head>
 <body>
 
-<audio id="bg-music" loop>
-  <source src="https://www.chosic.com/wp-content/uploads/2021/07/The-Reason-Hoobastank-Piano-Version.mp3" type="audio/mpeg">
+<audio id="player" loop>
+  <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
 </audio>
 
-<div id="music-control" onclick="toggleMusic()">🎵</div>
+<div id="music-btn" onclick="toggleMusic()">
+  <svg class="music-icon" viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+</div>
 
 <div class="book-container">
-  <div class="book" id="myBook">
+  <div class="book">
     
     <div class="page" style="z-index: 1;">
-      <div class="page-content">
-        <p class="quote">"Y así, nuestra historia se escribe un día a la vez."</p>
-        <p>💖</p>
-      </div>
+      <div class="quote">"Si el mundo se acaba hoy, me gustaría que me encontrara a tu lado."</div>
+      <div class="author">Boulevard</div>
+      <div class="footer-num">FIN</div>
     </div>
 
     <div class="page" onclick="flip(this)" style="z-index: 2;">
-      <div class="page-content">
-        <p class="quote">"Tú me das amor. Pero lo que yo necesito es esa fuerza que me ayude a sobrevivir."</p>
-        <span class="author">LOS JUEGOS DEL HAMBRE</span>
-      </div>
+      <div class="quote">"Tú me das amor. Pero lo que yo necesito es esa fuerza que me ayude a sobrevivir."</div>
+      <div class="author">Los Juegos del Hambre</div>
+      <div class="footer-num">III</div>
     </div>
 
     <div class="page" onclick="flip(this)" style="z-index: 3;">
-      <div class="page-content">
-        <p class="quote">"No quiero que me bajen la luna, quiero que alguien se siente a verla conmigo."</p>
-        <span class="author">HASTA QUE NOS QUEDEMOS SIN ESTRELLAS</span>
-      </div>
+      <div class="quote">"No quiero que me bajen la luna, quiero que alguien se siente a verla conmigo."</div>
+      <div class="author">Hasta que nos quedemos sin estrellas</div>
+      <div class="footer-num">II</div>
     </div>
 
     <div class="page" onclick="flip(this)" style="z-index: 4;">
-      <div class="page-content">
-        <p class="quote">"Luke era el sol y yo la luna, y en un mundo perfecto, el eclipse sería eterno."</p>
-        <span class="author">BOULEVARD</span>
-      </div>
+      <div class="quote">"Luke era el sol y yo la luna, y en un mundo perfecto, el eclipse sería eterno."</div>
+      <div class="author">Boulevard</div>
+      <div class="footer-num">I</div>
     </div>
 
     <div class="page cover" onclick="flip(this)" style="z-index: 5;">
-      <div class="page-content">
-        <h1 class="book-title">Nuestro Libro</h1>
-        <p>Para la persona que ilumina mi vida</p>
-        <p style="font-size: 0.8rem; margin-top: 20px;">(Toca para abrir)</p>
+      <div class="cover-border">
+        <h1 style="font-family:'Playfair Display'; margin:0;">Para Ti</h1>
+        <p style="font-style:italic; font-size: 0.9rem; margin-top:10px;">Nuestra historia en frases</p>
+        <p style="font-size: 0.6rem; letter-spacing: 2px; margin-top: 30px;">TOCA PARA ABRIR</p>
       </div>
     </div>
 
@@ -168,30 +209,35 @@
 </div>
 
 <script>
-  const audio = document.getElementById('bg-music');
-  const btn = document.getElementById('music-control');
-  let isPlaying = false;
+  const player = document.getElementById('player');
+  let musicActive = false;
 
-  // Función para pasar página
-  function flip(page) {
-    page.classList.toggle('flipped');
+  function flip(el) {
+    el.classList.toggle('flipped');
     
-    // Si es la portada la que se abre, intentamos poner música
-    if (!isPlaying) {
-      toggleMusic();
+    // Iniciar música con el primer clic si no está activa
+    if(!musicActive) {
+      startMusic();
     }
   }
 
-  // Control de música corregido
+  function startMusic() {
+    player.play().then(() => {
+      musicActive = true;
+      document.querySelector('.music-icon').style.fill = '#d4a76a';
+    }).catch(err => {
+      console.log("Esperando interacción para audio...");
+    });
+  }
+
   function toggleMusic() {
-    if (isPlaying) {
-      audio.pause();
-      btn.innerText = "🔇";
+    if (player.paused) {
+      player.play();
+      document.querySelector('.music-icon').style.fill = '#d4a76a';
     } else {
-      audio.play().catch(e => console.log("El navegador bloqueó el autoplay inicial"));
-      btn.innerText = "🎵";
+      player.pause();
+      document.querySelector('.music-icon').style.fill = '#c2678a';
     }
-    isPlaying = !isPlaying;
   }
 </script>
 
