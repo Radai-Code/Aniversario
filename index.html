@@ -3,17 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Para Ti 💖</title>
+<title>Nuestro Libro de Amor 💖</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
 <script src="https://w.soundcloud.com/player/api.js"></script>
 <style>
   :root {
-    --rose: #e8a0b4;
     --rose-deep: #c2678a;
     --gold: #d4a76a;
     --ink: #3a2a35;
     --parchment: #fef9f2;
-    --shadow: rgba(60,20,40,0.18);
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -21,87 +19,74 @@
   body {
     min-height: 100vh;
     background: radial-gradient(ellipse at 30% 20%, #fce4ec 0%, #f8bbd0 30%, #f48fb1 60%, #e91e8c22 100%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Cormorant Garamond', serif;
-    overflow: hidden;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    font-family: 'Cormorant Garamond', serif; overflow: hidden;
   }
 
   #particles-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
 
-  /* COUNTER */
   .counter-box {
-    position: relative; z-index: 10;
-    background: rgba(255,255,255,0.55);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(232,160,180,0.5);
-    border-radius: 50px; padding: 8px 24px; margin-bottom: 18px;
+    position: relative; z-index: 10; background: rgba(255,255,255,0.55);
+    backdrop-filter: blur(12px); border: 1px solid rgba(232,160,180,0.5);
+    border-radius: 50px; padding: 8px 24px; margin-bottom: 25px;
     font-size: 0.9rem; color: var(--ink); text-align: center;
-    box-shadow: 0 4px 20px var(--shadow);
+    box-shadow: 0 4px 20px rgba(60,20,40,0.18);
   }
   .counter-box span { color: var(--rose-deep); font-weight: 700; font-family: 'Playfair Display', serif; }
 
-  /* BOOK SCENE */
   .book-scene {
-    position: relative; z-index: 10;
-    perspective: 2000px;
+    position: relative; z-index: 10; perspective: 2000px;
     width: min(380px, 90vw); height: min(480px, 70vh);
   }
 
   .book { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; }
 
-  /* SPINE (LOMO) */
   .book-spine {
-    position: absolute; left: 0; top: 0; width: 28px; height: 100%;
+    position: absolute; left: 0; top: 0; width: 30px; height: 100%;
     background: linear-gradient(180deg, var(--rose-deep) 0%, #a04e70 50%, var(--rose-deep) 100%);
-    border-radius: 6px 0 0 6px; z-index: 50;
+    border-radius: 6px 0 0 6px; z-index: 200;
   }
 
-  /* PAGES */
   .page {
-    position: absolute; top: 0; left: 28px;
-    width: calc(100% - 28px); height: 100%;
-    background: var(--parchment);
-    border-radius: 0 10px 10px 0;
-    transform-origin: left center;
-    transition: transform 1s cubic-bezier(0.645, 0.045, 0.355, 1);
-    transform-style: preserve-3d;
-    cursor: pointer;
-    backface-visibility: hidden;
-    box-shadow: inset 3px 0 10px rgba(0,0,0,0.1);
+    position: absolute; top: 5px; left: 30px;
+    width: calc(100% - 35px); height: calc(100% - 10px);
+    background: var(--parchment); border-radius: 0 10px 10px 0;
+    transform-origin: left center; transition: transform 1s cubic-bezier(0.645, 0.045, 0.355, 1);
+    transform-style: preserve-3d; cursor: pointer; backface-visibility: hidden;
+    box-shadow: inset 3px 0 10px rgba(0,0,0,0.05), 2px 2px 5px rgba(0,0,0,0.1);
   }
 
-  .page.flipped { transform: rotateY(-180deg) scale(1.01); z-index: 0 !important; }
+  .page.flipped { transform: rotateY(-180deg); z-index: 0 !important; }
 
   .page-content {
-    width: 100%; height: 100%; padding: 40px 30px;
+    width: 100%; height: 100%; padding: 35px;
     display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
   }
 
-  /* COVER */
   .cover {
     background: linear-gradient(135deg, #f4b8cf 0%, #e8839f 40%, #c2678a 100%) !important;
-    z-index: 100; color: white; border-radius: 0 12px 12px 0;
+    z-index: 150; color: white; border-radius: 0 12px 12px 0;
   }
 
-  .cover-border { border: 2px solid rgba(255,255,255,0.4); height: 90%; width: 85%; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+  .quote { font-size: 1.2rem; font-style: italic; color: var(--ink); line-height: 1.5; margin-bottom: 15px; }
+  .author { font-size: 0.75rem; color: var(--rose-deep); letter-spacing: 2px; text-transform: uppercase; font-weight: bold; }
 
-  .quote { font-size: 1.3rem; font-style: italic; color: var(--ink); line-height: 1.5; margin-bottom: 15px; }
-  .author { font-size: 0.8rem; color: var(--rose-deep); letter-spacing: 2px; text-transform: uppercase; }
-
-  /* MUSIC BUTTON */
-  #music-btn {
+  /* CONTROLES DE MÚSICA ACTUALIZADOS */
+  .music-player-ui {
     position: fixed; bottom: 25px; right: 25px; z-index: 1000;
-    width: 50px; height: 50px; border-radius: 50%;
-    background: white; border: 2px solid var(--rose-deep);
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer; font-size: 1.5rem; box-shadow: 0 4px 15px var(--shadow);
+    display: flex; align-items: center; gap: 10px;
+    background: white; padding: 5px 15px; border-radius: 40px;
+    border: 2px solid var(--rose-deep); box-shadow: 0 4px 15px rgba(0,0,0,0.2);
   }
 
-  .nav-area { margin-top: 20px; display: flex; align-items: center; gap: 15px; z-index: 20; }
-  .nav-btn { background: white; border: 1px solid var(--rose-deep); color: var(--rose-deep); padding: 5px 15px; border-radius: 15px; cursor: pointer; }
+  .music-btn-ui {
+    background: none; border: none; cursor: pointer; font-size: 1.2rem;
+    color: var(--rose-deep); padding: 5px; transition: transform 0.2s;
+  }
+  .music-btn-ui:hover { transform: scale(1.2); }
+  
+  #music-status { font-size: 0.65rem; color: var(--rose-deep); font-weight: bold; min-width: 60px; text-align: center; }
+
 </style>
 </head>
 <body>
@@ -113,86 +98,92 @@
 </div>
 
 <div class="book-scene">
-  <div class="book" id="book">
+  <div class="book">
     <div class="book-spine"></div>
 
     <div class="page" style="z-index: 1;">
-      <div class="page-content">
-        <p class="quote">"Prométeme que pase lo que pase, siempre buscaremos la misma estrella."</p>
-        <span class="author">Hasta que nos quedemos sin estrellas</span>
-      </div>
+        <div class="page-content"><p class="quote">"No importa lo que pase mañana, te quiero hoy."</p><span class="author">Nuestro Camino Eterno</span></div>
     </div>
 
-    <div class="page" onclick="this.classList.add('flipped')" style="z-index: 2;">
+    <div class="page" onclick="this.classList.add('flipped')" style="z-index: 10;"><div class="page-content"><p class="quote">"¿Me amas? ¿Real o no real? —Real."</p><span class="author">Los Juegos del Hambre</span></div></div>
+    <div class="page" onclick="this.classList.add('flipped')" style="z-index: 11;"><div class="page-content"><p class="quote">"Ella no me necesita. Y yo... yo no puedo vivir sin ella."</p><span class="author">Los Juegos del Hambre</span></div></div>
+    <div class="page" onclick="this.classList.add('flipped')" style="z-index: 15;"><div class="page-content"><p class="quote">"—Buenas noches, Liam. —Buenas noches, supernova."</p><span class="author">Hasta que nos quedemos sin estrellas</span></div></div>
+    <div class="page" onclick="this.classList.add('flipped')" style="z-index: 16;"><div class="page-content"><p class="quote">"Prométeme que pase lo que pase, siempre buscaremos la misma estrella."</p><span class="author">Hasta que nos quedemos sin estrellas</span></div></div>
+    <div class="page" onclick="this.classList.add('flipped')" style="z-index: 20;"><div class="page-content"><p class="quote">"Rompe mi corazón si quieres, pero no te vayas. Nunca lo hagas."</p><span class="author">Boulevard</span></div></div>
+    <div class="page" onclick="this.classList.add('flipped')" style="z-index: 21;"><div class="page-content"><p class="quote">"Luke era el sol y yo la luna, y en un mundo perfecto, el eclipse sería eterno."</p><span class="author">Boulevard</span></div></div>
+    <div class="page" onclick="this.classList.add('flipped')" style="z-index: 22;"><div class="page-content"><p class="quote">"Ahora sé que la droga más fuerte de un ser humano es otro ser humano."</p><span class="author">Boulevard</span></div></div>
+
+    <div class="page cover" onclick="openBook(this)" style="z-index: 100;">
       <div class="page-content">
-        <p class="quote">"Tú me das amor. Pero lo que yo necesito es esa fuerza que me ayude a sobrevivir."</p>
-        <span class="author">Los Juegos del Hambre</span>
+        <h2 style="font-family:'Playfair Display'; font-size: 2.2rem;">Para Ti</h2>
+        <p style="margin-top: 10px; font-style: italic;">Nuestra historia en música y letras</p>
+        <p style="margin-top: 40px; font-size: 0.7rem; letter-spacing: 2px;">✦ TOCA PARA ABRIR ✦</p>
       </div>
     </div>
-
-    <div class="page" onclick="this.classList.add('flipped')" style="z-index: 3;">
-      <div class="page-content">
-        <p class="quote">"No quiero que me bajen la luna, quiero que alguien se siente a verla conmigo."</p>
-        <span class="author">Hasta que nos quedemos sin estrellas</span>
-      </div>
-    </div>
-
-    <div class="page" onclick="this.classList.add('flipped')" style="z-index: 4;">
-      <div class="page-content">
-        <p class="quote">"Luke era el sol y yo la luna, y en un mundo perfecto, el eclipse sería eterno."</p>
-        <span class="author">Boulevard</span>
-      </div>
-    </div>
-
-    <div class="page cover" onclick="openBook(this)" style="z-index: 5;">
-      <div class="page-content">
-        <div class="cover-border">
-          <h2 style="font-family:'Playfair Display'">Nuestro Libro</h2>
-          <p style="font-size: 0.8rem; margin-top: 10px;">CADA PÁGINA, UN DÍA CONTIGO</p>
-          <p style="margin-top: 30px; font-size: 0.7rem; opacity: 0.8;">✦ Toca para abrir ✦</p>
-        </div>
-      </div>
-    </div>
-
   </div>
 </div>
 
-<div class="nav-area" id="nav-area" style="display:none">
-  <button class="nav-btn" onclick="location.reload()">Reiniciar Libro</button>
+<div style="display:none">
+  <iframe id="track1" src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/kevin-brian-2/the-reason-hoobastank&auto_play=false"></iframe>
+  <iframe id="track2" src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/florian-n-3/wonderwall-oasis&auto_play=false"></iframe>
 </div>
 
-<iframe id="sc-widget"
-  src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/kevin-brian-2/the-reason-hoobastank&color=%23c2678a&auto_play=false&hide_related=true&show_comments=false&show_user=false&show_reposts=false&show_teaser=false"
-  style="display:none;" allow="autoplay">
-</iframe>
-
-<div id="music-btn" onclick="toggleMusic()">🎵</div>
+<div class="music-player-ui">
+  <button class="music-btn-ui" onclick="changeTrack(-1)">⏮</button>
+  <button class="music-btn-ui" id="play-pause-btn" onclick="toggleMusic()">🎵</button>
+  <button class="music-btn-ui" onclick="changeTrack(1)">⏭</button>
+  <div id="music-status">HOOBASTANK</div>
+</div>
 
 <script>
-  // ANIVERSARIO (Cambia la fecha aquí si es necesario)
   const ANNIVERSARY = new Date("2024-12-13T00:00:00");
-  const widget = SC.Widget(document.getElementById('sc-widget'));
+  
+  // Lógica de Playlist
+  const tracks = [
+    { id: "track1", name: "HOOBASTANK", widget: null },
+    { id: "track2", name: "WONDERWALL", widget: null }
+  ];
+  let currentTrackIndex = 0;
   let isPlaying = false;
+
+  // Inicializar widgets
+  tracks.forEach(t => t.widget = SC.Widget(document.getElementById(t.id)));
 
   function openBook(cover) {
     cover.classList.add('flipped');
-    document.getElementById('nav-area').style.display = 'flex';
-    // Iniciar música automáticamente al abrir
     if(!isPlaying) toggleMusic();
   }
 
   function toggleMusic() {
+    const currentTrack = tracks[currentTrackIndex];
     if (isPlaying) {
-      widget.pause();
-      document.getElementById('music-btn').innerText = "🔇";
+      currentTrack.widget.pause();
+      document.getElementById('play-pause-btn').innerText = "🔇";
     } else {
-      widget.play();
-      document.getElementById('music-btn').innerText = "🎵";
+      currentTrack.widget.play();
+      document.getElementById('play-pause-btn').innerText = "🎵";
     }
     isPlaying = !isPlaying;
   }
 
-  // CONTADOR
+  function changeTrack(direction) {
+    // Pausar canción actual
+    tracks[currentTrackIndex].widget.pause();
+    
+    // Cambiar índice
+    currentTrackIndex = (currentTrackIndex + direction + tracks.length) % tracks.length;
+    
+    // Actualizar UI
+    document.getElementById('music-status').innerText = tracks[currentTrackIndex].name;
+    
+    // Si estaba sonando, reproducir la nueva
+    if (isPlaying) {
+      tracks[currentTrackIndex].widget.play();
+    } else {
+      toggleMusic(); // Esto la activa si estaba en pausa
+    }
+  }
+
   function updateCounter() {
     const now = new Date();
     const diff = now - ANNIVERSARY;
@@ -206,33 +197,18 @@
   setInterval(updateCounter, 1000);
   updateCounter();
 
-  // PARTÍCULAS (Corregidas para no dar lag)
+  // Animación de partículas simple
   const canvas = document.getElementById('particles-canvas');
   const ctx = canvas.getContext('2d');
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-
+  canvas.width = window.innerWidth; canvas.height = window.innerHeight;
   let particles = [];
-  function createParticle() {
-    return {
-      x: Math.random() * canvas.width,
-      y: canvas.height + 10,
-      size: Math.random() * 5 + 2,
-      speedY: -(Math.random() * 1 + 0.5),
-      opacity: Math.random() * 0.5 + 0.3
-    };
-  }
-
   function animate() {
     ctx.clearRect(0,0,canvas.width, canvas.height);
-    if(particles.length < 30 && Math.random() < 0.1) particles.push(createParticle());
+    if(particles.length < 20 && Math.random() < 0.1) particles.push({ x: Math.random()*canvas.width, y: canvas.height+10, speedY: -(Math.random()*0.5+0.2), opacity: 0.5 });
     particles.forEach((p, i) => {
-      p.y += p.speedY;
-      p.opacity -= 0.002;
+      p.y += p.speedY; p.opacity -= 0.001;
       ctx.fillStyle = `rgba(232, 160, 180, ${p.opacity})`;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
-      ctx.fill();
+      ctx.beginPath(); ctx.arc(p.x, p.y, 2, 0, Math.PI*2); ctx.fill();
       if(p.opacity <= 0) particles.splice(i, 1);
     });
     requestAnimationFrame(animate);
