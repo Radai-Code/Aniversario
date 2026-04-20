@@ -142,104 +142,86 @@
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════
-     🎵 MÚSICA — Player de YouTube oculto fuera de pantalla.
-     Sin cookies de terceros, funciona en todos los navegadores.
-     Para agregar/cambiar canciones edita el arreglo "tracks" en JS.
+     🎵 MÚSICA — Spotify Embed.
+     Para cambiar canciones, solo edita tu playlist en Spotify.
+     La página se actualiza sola sin tocar el código. 💖
      ═══════════════════════════════════════════════════════════════ -->
-<div id="yt-player" style="position:fixed;bottom:-400px;left:0;width:1px;height:1px;opacity:0;pointer-events:none;"></div>
+<iframe id="spotify-player"
+  src="https://open.spotify.com/embed/playlist/5gvxyfrpTOLmHdC8VCb4Iw?utm_source=generator&theme=0"
+  style="position:fixed;bottom:-500px;left:0;width:1px;height:1px;opacity:0;pointer-events:none;"
+  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+  loading="lazy">
+</iframe>
 
 <div class="music-ui">
-  <button class="m-btn" onclick="prevTrack()" title="Anterior">⏮</button>
+  <button class="m-btn" onclick="spotifyPrev()" title="Anterior">⏮</button>
   <button class="m-btn" id="play-pause" onclick="toggleMusic()">▶️</button>
-  <button class="m-btn" onclick="nextTrack()" title="Siguiente">⏭</button>
+  <button class="m-btn" onclick="spotifyNext()" title="Siguiente">⏭</button>
   <div id="track-name">♫ MÚSICA</div>
 </div>
 
 <script>
   // ═══════════════════════════════════════════════════════════════
-  // 🎵 CANCIONES — Para cambiar o agregar canciones edita aquí.
-  //    "id" son los 11 caracteres del link de YouTube después de ?v=
-  //    Ejemplo: youtube.com/watch?v=fV4DiAyExN0 → id: "fV4DiAyExN0"
+  // 🎵 SPOTIFY — Controla tu playlist desde los botones.
+  //    Para cambiar canciones solo edita tu playlist en Spotify.
+  //    No necesitas tocar este código nunca más. 💖
   // ═══════════════════════════════════════════════════════════════
-  const tracks = [
-    { name: "THE REASON", id: "fV4DiAyExN0" },  // Hoobastank - The Reason
-    { name: "WONDERWALL",  id: "bx1Bh8ZvH84" },  // Oasis - Wonderwall
-  ];
-
-  let currentIdx = 0;
   let playing = false;
-  let ytReady = false;
-  let player = null;
+  let spotifyReady = false;
 
-  // Cargar API de YouTube
-  const tag = document.createElement('script');
-  tag.src = 'https://www.youtube.com/iframe_api';
-  document.head.appendChild(tag);
+  // Esperar a que el iframe cargue
+  document.getElementById('spotify-player').addEventListener('load', () => {
+    spotifyReady = true;
+  });
 
-  function onYouTubeIframeAPIReady() {
-    player = new YT.Player('yt-player', {
-      height: '1',
-      width: '1',
-      videoId: tracks[0].id,
-      playerVars: {
-        autoplay: 0,
-        controls: 0,
-        disablekb: 1,
-        fs: 0,
-        iv_load_policy: 3,
-        modestbranding: 1,
-        rel: 0,
-        playsinline: 1,
-      },
-      events: {
-        onReady: () => { ytReady = true; },
-        onStateChange: (e) => {
-          if (e.data === YT.PlayerState.ENDED) nextTrack();
-        }
-      }
-    });
+  function getSpotifyFrame() {
+    return document.getElementById('spotify-player').contentWindow;
+  }
+
+  function sendSpotify(action) {
+    try {
+      getSpotifyFrame().postMessage({ command: action }, 'https://open.spotify.com');
+    } catch(e) {}
   }
 
   function startExperience(cover) {
     cover.classList.add('flipped');
-    setTimeout(() => {
-      if (ytReady) {
-        player.playVideo();
-        playing = true;
-        document.getElementById('play-pause').innerText = '⏸️';
-        document.getElementById('track-name').innerText = tracks[currentIdx].name;
-      }
-    }, 600);
+
+    // Hacer visible el iframe temporalmente para que el navegador permita audio
+    const frame = document.getElementById('spotify-player');
+    frame.style.width  = '300px';
+    frame.style.height = '80px';
+    frame.style.bottom = '90px';
+    frame.style.right  = '20px';
+    frame.style.left   = 'auto';
+    frame.style.opacity = '1';
+    frame.style.borderRadius = '12px';
+    frame.style.pointerEvents = 'auto';
+    frame.style.zIndex = '999';
+
+    document.getElementById('track-name').innerText = 'NUESTRA PLAYLIST';
+    playing = true;
+    document.getElementById('play-pause').innerText = '⏸️';
   }
 
   function toggleMusic() {
-    if (!ytReady) return;
+    const frame = document.getElementById('spotify-player');
     if (playing) {
-      player.pauseVideo();
+      sendSpotify('pause');
       document.getElementById('play-pause').innerText = '▶️';
     } else {
-      player.playVideo();
+      sendSpotify('play');
       document.getElementById('play-pause').innerText = '⏸️';
     }
     playing = !playing;
   }
 
-  function nextTrack() {
-    currentIdx = (currentIdx + 1) % tracks.length;
-    loadTrack();
+  function spotifyNext() {
+    sendSpotify('next');
   }
 
-  function prevTrack() {
-    currentIdx = (currentIdx - 1 + tracks.length) % tracks.length;
-    loadTrack();
-  }
-
-  function loadTrack() {
-    if (!ytReady) return;
-    player.loadVideoById(tracks[currentIdx].id);
-    playing = true;
-    document.getElementById('play-pause').innerText = '⏸️';
-    document.getElementById('track-name').innerText = tracks[currentIdx].name;
+  function spotifyPrev() {
+    sendSpotify('prev');
   }
 
   // CONTADOR
