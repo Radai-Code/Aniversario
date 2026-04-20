@@ -249,6 +249,47 @@
     background: var(--rose-deep); color: white; padding: 3px 10px;
     border-radius: 20px; margin-bottom: 8px; display: inline-block;
   }
+
+  /* ── BOTÓN ELIMINAR página ── */
+  .delete-page-btn {
+    position: absolute; top: 10px; right: 12px;
+    background: rgba(255,255,255,0.8); border: 1.5px solid rgba(194,103,138,0.3);
+    border-radius: 50%; width: 30px; height: 30px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.85rem; cursor: pointer; transition: all 0.2s;
+    color: var(--rose-deep); backdrop-filter: blur(4px);
+    z-index: 5;
+  }
+  .delete-page-btn:hover { background: #fee; border-color: #c2678a; transform: scale(1.1); }
+
+  /* ── MODAL CONFIRMAR ELIMINACIÓN ── */
+  .confirm-overlay {
+    position: fixed; inset: 0; background: rgba(60,20,40,0.5);
+    backdrop-filter: blur(6px); z-index: 3000;
+    display: none; align-items: center; justify-content: center; padding: 20px;
+  }
+  .confirm-overlay.show { display: flex; }
+  .confirm-box {
+    background: var(--parchment); border-radius: 20px; padding: 28px 26px;
+    width: min(340px, 100%); text-align: center;
+    box-shadow: 0 20px 60px rgba(60,20,40,0.3);
+    animation: modalIn 0.3s cubic-bezier(0.34,1.56,0.64,1) both;
+  }
+  .confirm-box h3 { font-family: 'Playfair Display', serif; color: var(--rose-deep); font-size: 1.2rem; margin-bottom: 8px; }
+  .confirm-box p  { font-size: 0.85rem; color: rgba(60,20,40,0.6); font-style: italic; margin-bottom: 20px; line-height: 1.5; }
+  .confirm-btns   { display: flex; gap: 10px; justify-content: center; }
+  .confirm-yes {
+    padding: 10px 24px; border-radius: 30px; border: none;
+    background: var(--rose-deep); color: white;
+    font-family: 'Playfair Display', serif; font-size: 0.95rem; cursor: pointer; transition: 0.2s;
+  }
+  .confirm-yes:hover { background: #a04e70; }
+  .confirm-no {
+    padding: 10px 20px; border-radius: 30px;
+    border: 2px solid rgba(194,103,138,0.4); background: transparent;
+    color: var(--rose-deep); font-size: 0.9rem; cursor: pointer; transition: 0.2s;
+  }
+  .confirm-no:hover { background: rgba(232,160,180,0.15); }
 </style>
 </head>
 <body>
@@ -310,6 +351,18 @@
     <div class="modal-btns">
       <button class="modal-cancel" onclick="closeModal()">Cancelar</button>
       <button class="modal-save" onclick="saveQuote()">Guardar en el libro 💖</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CONFIRMAR ELIMINAR -->
+<div class="confirm-overlay" id="confirm-modal">
+  <div class="confirm-box">
+    <h3>¿Eliminar esta frase?</h3>
+    <p id="confirm-preview"></p>
+    <div class="confirm-btns">
+      <button class="confirm-no"  onclick="closeConfirm()">Cancelar</button>
+      <button class="confirm-yes" onclick="deleteQuote()">Sí, eliminar</button>
     </div>
   </div>
 </div>
@@ -388,13 +441,14 @@ function buildPages() {
 
     page.innerHTML = `
       <div class="page-content">
-        ${isCustom ? '<div class="custom-badge">✦ Escrito por nosotros ✦</div>' : ''}
+        ${isCustom ? `<div class="custom-badge">✦ Escrito por nosotros ✦</div>` : ''}
         <div class="ornament"></div>
         <p class="quote">"${q.quote}"</p>
         <div class="ornament"></div>
         <span class="author">${q.source || q.book || ''}</span>
         ${isCustom && q.author ? `<div class="custom-tag">— ${q.author}</div>` : ''}
         ${isCustom && dateStr ? `<div class="custom-date-tag">${dateStr}</div>` : ''}
+        ${isCustom ? `<button class="delete-page-btn" onclick="confirmDelete(${i - fixedPages.length})" title="Eliminar esta frase">🗑️</button>` : ''}
         <div class="page-num right">Pág. ${(i+1)*2-1}</div>
       </div>
       <div class="page-back-content">
@@ -415,11 +469,10 @@ function buildPages() {
 // NAVEGACIÓN
 // ════════════════════════════════════════════════════════
 function updateNav() {
+  const total = allPages.length;
   document.getElementById('btn-prev').disabled = currentIdx <= 0;
-  document.getElementById('btn-next').disabled = currentIdx >= allPages.length - 1;
-  const cur = currentIdx + 1;
-  const tot = allPages.length;
-  document.getElementById('page-indicator').textContent = `${cur} / ${tot}`;
+  document.getElementById('btn-next').disabled = currentIdx >= total - 1;
+  document.getElementById('page-indicator').textContent = `${currentIdx + 1} / ${total}`;
 }
 
 function openBook() {
@@ -440,34 +493,44 @@ function openBook() {
   playing = true;
   document.getElementById('play-pause').innerText = '⏸️';
 
-  setTimeout(() => {
-    goToPage(0);
-  }, 700);
+  setTimeout(() => { goToPage(0); }, 700);
 }
 
 function goToPage(targetIdx) {
   if (isFlipping) return;
+  if (targetIdx === currentIdx) return;                      // ya estamos aquí
   if (targetIdx < 0 || targetIdx >= allPages.length) return;
+
   isFlipping = true;
 
   if (targetIdx > currentIdx) {
-    // Avanzar: voltear páginas de currentIdx+1 hasta targetIdx
+    // ── Avanzar ──
     let i = currentIdx + 1;
     const flipNext = () => {
-      if (i > targetIdx) { currentIdx = targetIdx; updateNav(); isFlipping = false; return; }
+      if (i > targetIdx) {
+        currentIdx = targetIdx;
+        updateNav();
+        isFlipping = false;
+        return;
+      }
       allPages[i].classList.add('flipped');
       i++;
-      setTimeout(flipNext, i === targetIdx + 1 ? 0 : 120);
+      setTimeout(flipNext, 110);
     };
     flipNext();
   } else {
-    // Regresar: des-voltear páginas de currentIdx hasta targetIdx+1
+    // ── Regresar ──
     let i = currentIdx;
     const unflipPrev = () => {
-      if (i < targetIdx) { currentIdx = targetIdx; updateNav(); isFlipping = false; return; }
+      if (i < targetIdx) {
+        currentIdx = targetIdx;
+        updateNav();
+        isFlipping = false;
+        return;
+      }
       allPages[i].classList.remove('flipped');
       i--;
-      setTimeout(unflipPrev, i < targetIdx ? 0 : 120);
+      setTimeout(unflipPrev, 110);
     };
     unflipPrev();
   }
@@ -542,6 +605,42 @@ function saveQuote() {
 
   showToast('✦ Frase guardada en el libro 💖');
   spawnHearts();
+}
+
+let pendingDeleteIdx = -1;
+
+function confirmDelete(customIdx) {
+  pendingDeleteIdx = customIdx;
+  const quotes = loadCustomQuotes();
+  const q = quotes[customIdx];
+  const preview = q ? `"${q.quote.substring(0, 60)}${q.quote.length > 60 ? '...' : ''}"` : '';
+  document.getElementById('confirm-preview').textContent = preview;
+  document.getElementById('confirm-modal').classList.add('show');
+}
+
+function closeConfirm() {
+  document.getElementById('confirm-modal').classList.remove('show');
+  pendingDeleteIdx = -1;
+}
+
+function deleteQuote() {
+  if (pendingDeleteIdx < 0) return;
+  const quotes = loadCustomQuotes();
+  quotes.splice(pendingDeleteIdx, 1);
+  saveCustomQuotes(quotes);
+  closeConfirm();
+
+  // Volver una página antes de reconstruir para no quedar en el vacío
+  const newIdx = Math.min(currentIdx, fixedPages.length + quotes.length - 1);
+  currentIdx = -1; // reset para que goToPage funcione desde 0
+  buildPages();
+
+  // Regresar a la página correcta sin animación
+  for (let i = 0; i <= newIdx; i++) allPages[i].classList.add('flipped');
+  currentIdx = newIdx;
+  updateNav();
+
+  showToast('Frase eliminada del libro');
 }
 
 function showToast(msg) {
