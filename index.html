@@ -170,7 +170,8 @@
     width: 44px; height: 44px; border-radius: 50%;
     background: rgba(255,255,255,0.85); backdrop-filter: blur(10px);
     border: 2px solid var(--rose-deep); color: var(--rose-deep);
-    font-size: 1.4rem; cursor: pointer; transition: all 0.2s;
+    font-size: 1.6rem; font-weight: 300; line-height: 1;
+    cursor: pointer; transition: all 0.2s;
     display: flex; align-items: center; justify-content: center;
     box-shadow: 0 4px 14px var(--shadow);
   }
@@ -329,18 +330,18 @@
 
 <!-- NAVEGACIÓN -->
 <div class="nav-bar" id="nav-bar" style="display:none">
-  <button class="nav-btn" id="btn-prev" onclick="prevPage()" title="Página anterior">‹</button>
+  <button class="nav-btn" id="btn-prev" onclick="prevPage()" title="Página anterior">←</button>
   <div class="page-indicator" id="page-indicator">1 / 1</div>
-  <button class="nav-btn" id="btn-next" onclick="nextPage()" title="Página siguiente">›</button>
+  <button class="nav-btn" id="btn-next" onclick="nextPage()" title="Página siguiente">→</button>
 </div>
 
 <!-- BOTÓN AGREGAR FRASE -->
-<button class="add-btn" id="add-btn" title="Agregar frase al libro" onclick="openModal()" style="display:none">✍️</button>
+<button class="add-btn" id="add-btn" title="Agregar frase al libro" onclick="openModal()" style="display:none">+</button>
 
 <!-- MODAL -->
 <div class="modal-overlay" id="modal">
   <div class="modal">
-    <h3>✍️ Escribir en el libro</h3>
+    <h3>✦ Escribir en el libro</h3>
     <p class="modal-sub">Tu frase quedará guardada para siempre en estas páginas</p>
     <label>Tu frase o mensaje</label>
     <textarea id="inp-quote" rows="3" placeholder='"Lo que siento por ti no tiene nombre..."'></textarea>
@@ -379,10 +380,10 @@
 </iframe>
 
 <div class="music-ui">
-  <button class="m-btn" onclick="spotifyPrev()">⏮</button>
-  <button class="m-btn" id="play-pause" onclick="toggleMusic()">▶️</button>
-  <button class="m-btn" onclick="spotifyNext()">⏭</button>
-  <div id="track-name">♫ MÚSICA</div>
+  <button class="m-btn" onclick="spotifyPrev()">⟨⟨</button>
+  <button class="m-btn" id="play-pause" onclick="toggleMusic()">▷</button>
+  <button class="m-btn" onclick="spotifyNext()">⟩⟩</button>
+  <div id="track-name">♩ música</div>
 </div>
 
 <style>
@@ -448,7 +449,7 @@ function buildPages() {
         <span class="author">${q.source || q.book || ''}</span>
         ${isCustom && q.author ? `<div class="custom-tag">— ${q.author}</div>` : ''}
         ${isCustom && dateStr ? `<div class="custom-date-tag">${dateStr}</div>` : ''}
-        ${isCustom ? `<button class="delete-page-btn" onclick="confirmDelete(${i - fixedPages.length})" title="Eliminar esta frase">🗑️</button>` : ''}
+        ${isCustom ? `<button class="delete-page-btn" onclick="confirmDelete(${i - fixedPages.length})" title="Eliminar esta frase">×</button>` : ''}
         <div class="page-num right">Pág. ${(i+1)*2-1}</div>
       </div>
       <div class="page-back-content">
@@ -489,51 +490,46 @@ function openBook() {
     width:300px;height:80px;opacity:1;border-radius:12px;
     pointer-events:auto;z-index:999;
   `;
-  document.getElementById('track-name').innerText = 'NUESTRA PLAYLIST';
+  document.getElementById('track-name').innerText = '♩ nuestra playlist';
   playing = true;
-  document.getElementById('play-pause').innerText = '⏸️';
+  document.getElementById('play-pause').innerText = '⏸';
 
   setTimeout(() => { goToPage(0); }, 700);
 }
 
 function goToPage(targetIdx) {
   if (isFlipping) return;
-  if (targetIdx === currentIdx) return;                      // ya estamos aquí
+  if (targetIdx === currentIdx) return;
   if (targetIdx < 0 || targetIdx >= allPages.length) return;
 
   isFlipping = true;
 
+  // Construir lista de páginas a voltear/des-voltear en orden
+  const steps = [];
+
   if (targetIdx > currentIdx) {
-    // ── Avanzar ──
-    let i = currentIdx + 1;
-    const flipNext = () => {
-      if (i > targetIdx) {
-        currentIdx = targetIdx;
-        updateNav();
-        isFlipping = false;
-        return;
-      }
-      allPages[i].classList.add('flipped');
-      i++;
-      setTimeout(flipNext, 110);
-    };
-    flipNext();
+    // Avanzar: voltear páginas currentIdx+1 … targetIdx
+    for (let i = currentIdx + 1; i <= targetIdx; i++) steps.push({ page: allPages[i], flip: true });
   } else {
-    // ── Regresar ──
-    let i = currentIdx;
-    const unflipPrev = () => {
-      if (i < targetIdx) {
-        currentIdx = targetIdx;
-        updateNav();
-        isFlipping = false;
-        return;
-      }
-      allPages[i].classList.remove('flipped');
-      i--;
-      setTimeout(unflipPrev, 110);
-    };
-    unflipPrev();
+    // Regresar: des-voltear páginas currentIdx … targetIdx+1
+    for (let i = currentIdx; i > targetIdx; i--) steps.push({ page: allPages[i], flip: false });
   }
+
+  let step = 0;
+  const run = () => {
+    if (step >= steps.length) {
+      currentIdx = targetIdx;
+      updateNav();
+      isFlipping = false;
+      return;
+    }
+    const { page, flip } = steps[step];
+    if (flip) page.classList.add('flipped');
+    else      page.classList.remove('flipped');
+    step++;
+    setTimeout(run, steps.length === 1 ? 0 : 120);
+  };
+  run();
 }
 
 function nextPage() { if (!isFlipping) goToPage(currentIdx + 1); }
@@ -733,10 +729,10 @@ function sendSpotify(action) {
 function toggleMusic() {
   if (playing) {
     sendSpotify('pause');
-    document.getElementById('play-pause').innerText = '▶️';
+    document.getElementById('play-pause').innerText = '▷';
   } else {
     sendSpotify('play');
-    document.getElementById('play-pause').innerText = '⏸️';
+    document.getElementById('play-pause').innerText = '⏸';
   }
   playing = !playing;
 }
