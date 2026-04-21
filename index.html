@@ -284,25 +284,23 @@ canvas#bg { position:fixed; inset:0; pointer-events:none; z-index:0; }
     <button class="nbtn" id="bn" onclick="nextPage()">→</button>
   </div>
 
-  <!-- Audio oculto — archive.org, sin anuncios, canciones completas -->
-  <audio id="player" preload="none"></audio>
-
-  <!-- MÚSICA -->
+  <!-- MÚSICA — YouTube (canciones completas, sin límite) -->
   <div class="music-bar" id="mbar" style="display:none">
     <div class="mb-info">
       <div class="mb-title" id="mt">♩ The Reason</div>
       <div class="mb-sub">nuestra playlist</div>
     </div>
     <div class="mb-controls">
-      <button class="mc" onclick="prevT()">⟨</button>
+      <button class="mc" onclick="prevT()" title="Anterior">⟨</button>
       <button class="mc" id="pp" onclick="togglePlay()">▷</button>
-      <button class="mc" onclick="nextT()">⟩</button>
+      <button class="mc" onclick="nextT()" title="Siguiente">⟩</button>
     </div>
   </div>
 
 </div><!-- /wrap -->
 
-<!-- (sin iframe externo — audio nativo) -->
+<!-- YouTube iframe oculto (NO display:none, solo fuera de pantalla) -->
+<div id="yt"></div>
 
 <!-- Botón agregar -->
 <button class="add-btn" id="ab" onclick="openModal()">+</button>
@@ -426,8 +424,9 @@ function openBook() {
   document.getElementById('nav').style.display='flex';
   document.getElementById('ab').style.display='flex';
   document.getElementById('mbar').style.display='flex';
-  loadTrack(0, false); // carga la primera canción lista para tocar
   setTimeout(()=>go(0), 700);
+  // Iniciar música
+  setTimeout(()=>{ if(ytReady) yt.playVideo(); }, 1200);
 }
 
 function go(t) {
@@ -518,44 +517,46 @@ function hearts(){
 }
 
 // ══════════════════════════════════════════════
-// MÚSICA — archive.org MP3, sin anuncios, completas
-// Para agregar canciones añade entradas a TRACKS
-// con el link directo del MP3 de archive.org
+// MÚSICA — YouTube IFrame API
 // ══════════════════════════════════════════════
-const TRACKS = [
-  {
-    title: "The Reason",
-    url: "https://archive.org/download/EnglishSongs_43/Hoobastank%20-%20The%20Reason"
-  },
-  {
-    title: "Wonderwall",
-    url: "https://archive.org/download/mp-3-dl.-cc-wonderwall-320k/%5BMP3DL.CC%5D%20Wonderwall-320k.mp3"
-  },
-];
+let yt=null, ytReady=false, playing=false, tIdx=0;
 
-let tIdx=0, playing=false;
-const player = document.getElementById('player');
+// Cargar API
+const s=document.createElement('script');
+s.src='https://www.youtube.com/iframe_api';
+document.head.appendChild(s);
 
-player.addEventListener('ended', () => nextT());
-player.addEventListener('play',  () => { playing=true;  setIcon('⏸'); });
-player.addEventListener('pause', () => { playing=false; setIcon('▷'); });
-
-function setIcon(ic){ document.getElementById('pp').textContent = ic; }
-function setTitle(i){ document.getElementById('mt').textContent = '♩ ' + TRACKS[i].title; }
-
-function loadTrack(i, autoplay) {
-  tIdx = i;
-  player.src = TRACKS[i].url;
-  setTitle(i);
-  if (autoplay) player.play().catch(()=>{});
+function onYouTubeIframeAPIReady(){
+  yt=new YT.Player('yt',{
+    height:'1', width:'1',
+    videoId: TRACKS[0].id,
+    playerVars:{ autoplay:0, controls:0, disablekb:1, fs:0, iv_load_policy:3, modestbranding:1, rel:0, playsinline:1 },
+    events:{
+      onReady:()=>{ ytReady=true; },
+      onStateChange:(e)=>{
+        if(e.data===YT.PlayerState.PLAYING){ playing=true;  setIcon('⏸'); }
+        if(e.data===YT.PlayerState.PAUSED)  { playing=false; setIcon('▷'); }
+        if(e.data===YT.PlayerState.ENDED)    nextT();
+      }
+    }
+  });
 }
 
-function togglePlay() {
-  if (player.paused) player.play().catch(()=>{});
-  else player.pause();
+function setIcon(ic){ document.getElementById('pp').textContent=ic; }
+function setTitle(i){ document.getElementById('mt').textContent='♩ '+TRACKS[i].title; }
+
+function togglePlay(){
+  if(!ytReady)return;
+  playing ? yt.pauseVideo() : yt.playVideo();
 }
-function nextT() { loadTrack((tIdx+1) % TRACKS.length, true); }
-function prevT() { loadTrack((tIdx-1+TRACKS.length) % TRACKS.length, true); }
+function nextT(){
+  tIdx=(tIdx+1)%TRACKS.length;
+  if(ytReady){ yt.loadVideoById(TRACKS[tIdx].id); setTitle(tIdx); }
+}
+function prevT(){
+  tIdx=(tIdx-1+TRACKS.length)%TRACKS.length;
+  if(ytReady){ yt.loadVideoById(TRACKS[tIdx].id); setTitle(tIdx); }
+}
 
 // ══════════════════════════════════════════════
 // CONTADOR
