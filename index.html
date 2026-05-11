@@ -1,599 +1,974 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Para Ti 💖</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
-<style>
-:root {
-  --rose:    #c2678a;
-  --gold:    #d4a76a;
-  --ink:     #3a2a35;
-  --parch:   #fef9f2;
-  --sh:      rgba(60,20,40,0.16);
-}
-*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Para Ti 💖</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+  <style>
+    /* ════════════════════════════════════════
+       VARIABLES & RESET
+    ════════════════════════════════════════ */
+    :root {
+      --rose:    #c2678a;
+      --rose-lt: #e8839f;
+      --gold:    #d4a76a;
+      --ink:     #3a2a35;
+      --parch:   #fef9f2;
+      --glass:   rgba(255,255,255,0.60);
+      --sh:      rgba(60,20,40,0.14);
+    }
+    *, *::before, *::after {
+      margin: 0; padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+    html, body {
+      height: 100%; overflow: hidden;
+      font-family: 'Cormorant Garamond', serif;
+      background:
+        radial-gradient(ellipse at 30% 10%, #fce4ec 0%, #f8bbd0 40%, #f48fb1 75%, transparent 100%),
+        linear-gradient(150deg, #fce4ec 0%, #f8bbd0 100%);
+    }
 
-html { height:100%; }
-body {
-  min-height:100%; height:100%;
-  background: radial-gradient(ellipse at 35% 15%, #fce4ec 0%, #f8bbd0 38%, #f48fb1 72%, transparent 100%),
-              linear-gradient(160deg,#fce4ec,#f8bbd0);
-  font-family:'Cormorant Garamond',serif;
-  display:flex; flex-direction:column; align-items:center;
-  justify-content:center; overflow:hidden;
-}
+    /* ════════════════════════════════════════
+       CANVAS DE PARTÍCULAS (fondo)
+    ════════════════════════════════════════ */
+    #bg-canvas {
+      position: fixed; inset: 0;
+      pointer-events: none; z-index: 0;
+    }
 
-canvas#bg { position:fixed; inset:0; pointer-events:none; z-index:0; }
+    /* ════════════════════════════════════════
+       LAYOUT PRINCIPAL
+    ════════════════════════════════════════ */
+    .app {
+      position: relative; z-index: 10;
+      width: 100%; height: 100%;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: clamp(10px, 2vh, 20px) clamp(12px, 3vw, 20px);
+      gap: clamp(8px, 1.8vh, 14px);
+    }
 
-/* ─── WRAPPER CENTRAL ─── */
-.wrap {
-  position:relative; z-index:10;
-  width:min(440px, 96vw);
-  display:flex; flex-direction:column; align-items:center;
-  gap:clamp(8px,2vh,14px);
-  padding: clamp(10px,2vh,18px) 0;
-}
+    /* ════════════════════════════════════════
+       CONTADOR
+    ════════════════════════════════════════ */
+    .counter {
+      width: min(460px, 100%);
+      background: var(--glass); backdrop-filter: blur(16px);
+      border: 1px solid rgba(232,160,180,0.38);
+      border-radius: 40px;
+      padding: clamp(7px,1.5vh,11px) clamp(16px,4vw,28px);
+      text-align: center;
+      box-shadow: 0 4px 18px var(--sh);
+    }
+    .counter-main {
+      font-size: clamp(0.72rem, 2.3vw, 0.9rem);
+      color: var(--ink);
+      display: flex; align-items: center; justify-content: center;
+      flex-wrap: wrap; gap: 4px 10px;
+    }
+    .counter-unit { display: flex; flex-direction: column; align-items: center; }
+    .counter-val {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1rem, 3.5vw, 1.4rem);
+      color: var(--rose); font-weight: 700; line-height: 1;
+    }
+    .counter-lbl {
+      font-size: clamp(0.55rem, 1.6vw, 0.65rem);
+      color: var(--ink); opacity: 0.5;
+      text-transform: uppercase; letter-spacing: 0.1em;
+    }
+    .counter-sep { color: rgba(194,103,138,0.35); font-size: 0.9rem; align-self: flex-start; margin-top: 2px; }
+    .counter-since {
+      margin-top: 4px;
+      font-size: clamp(0.58rem, 1.7vw, 0.7rem);
+      color: var(--rose); opacity: 0.7;
+      font-style: italic;
+    }
 
-/* ─── CONTADOR ─── */
-.counter {
-  width:100%;
-  background:rgba(255,255,255,0.58); backdrop-filter:blur(14px);
-  border:1px solid rgba(232,160,180,0.4); border-radius:40px;
-  padding:clamp(6px,1.5vh,9px) clamp(14px,4vw,22px);
-  text-align:center; color:var(--ink);
-  font-size:clamp(0.68rem,2.2vw,0.85rem);
-  box-shadow:0 3px 16px var(--sh);
-}
-.counter b { color:var(--rose); font-family:'Playfair Display',serif; }
-.counter small { display:block; font-size:clamp(0.58rem,1.8vw,0.7rem); color:var(--rose); opacity:.72; font-style:italic; margin-top:2px; }
+    /* ════════════════════════════════════════
+       LIBRO
+    ════════════════════════════════════════ */
+    .book-scene {
+      width: min(460px, 100%);
+      height: clamp(250px, 44vh, 410px);
+      perspective: 1800px;
+      flex-shrink: 0;
+    }
+    .book {
+      width: 100%; height: 100%;
+      position: relative; transform-style: preserve-3d;
+    }
 
-/* ─── LIBRO ─── */
-.book-scene {
-  width:100%;
-  height: clamp(260px, 44vh, 400px);
-  perspective:1800px;
-  flex-shrink:0;
-}
-.book { width:100%; height:100%; position:relative; transform-style:preserve-3d; }
+    /* Lomo */
+    .spine {
+      position: absolute; left: 0; top: 0;
+      width: 26px; height: 100%;
+      background: linear-gradient(180deg, var(--rose) 0%, #9e4b6a 50%, var(--rose) 100%);
+      border-radius: 6px 0 0 6px; z-index: 200;
+      box-shadow: -2px 0 8px rgba(60,20,40,0.22);
+    }
+    .spine-dot {
+      position: absolute; left: 50%; transform: translateX(-50%);
+      width: 4px; height: 4px; border-radius: 50%;
+      background: rgba(255,255,255,0.38);
+    }
 
-.spine {
-  position:absolute; left:0; top:0; width:26px; height:100%;
-  background:linear-gradient(180deg,var(--rose) 0%,#9e4b6a 50%,var(--rose) 100%);
-  border-radius:6px 0 0 6px; z-index:200;
-  box-shadow:-2px 0 8px rgba(60,20,40,0.22);
-}
-.spine-dot { position:absolute; left:50%; transform:translateX(-50%); width:4px; height:4px; border-radius:50%; background:rgba(255,255,255,0.38); }
+    /* Páginas */
+    .page {
+      position: absolute; top: 4px; left: 26px;
+      width: calc(100% - 30px); height: calc(100% - 8px);
+      background: var(--parch); border-radius: 0 10px 10px 0;
+      transform-origin: left center;
+      transition: transform 0.82s cubic-bezier(0.645, 0.045, 0.355, 1);
+      transform-style: preserve-3d; backface-visibility: hidden;
+      box-shadow: inset 2px 0 8px rgba(0,0,0,0.04), 2px 2px 7px rgba(0,0,0,0.1);
+    }
+    /* Líneas sutiles de página */
+    .page::after {
+      content: ''; position: absolute; inset: 0;
+      border-radius: 0 10px 10px 0; pointer-events: none;
+      background: repeating-linear-gradient(
+        transparent, transparent 30px,
+        rgba(232,160,180,0.07) 30px, rgba(232,160,180,0.07) 31px
+      );
+    }
+    /* Esquina doblada */
+    .page:not(.cover)::before {
+      content: ''; position: absolute; bottom: 0; right: 0; z-index: 3;
+      border-style: solid; border-width: 0 0 18px 18px;
+      border-color: transparent transparent rgba(232,160,180,0.2) transparent;
+      transition: border-width 0.28s ease;
+    }
+    .page:not(.cover):hover::before {
+      border-width: 0 0 32px 32px;
+      border-color: transparent transparent rgba(232,160,180,0.38) transparent;
+    }
+    .page.flipped { transform: rotateY(-180deg); }
 
-.page {
-  position:absolute; top:4px; left:26px;
-  width:calc(100% - 30px); height:calc(100% - 8px);
-  background:var(--parch); border-radius:0 10px 10px 0;
-  transform-origin:left center;
-  transition:transform .8s cubic-bezier(.645,.045,.355,1);
-  transform-style:preserve-3d; backface-visibility:hidden;
-  box-shadow:inset 2px 0 8px rgba(0,0,0,.04), 2px 2px 6px rgba(0,0,0,.1);
-}
-.page::after {
-  content:''; position:absolute; inset:0; border-radius:0 10px 10px 0;
-  pointer-events:none;
-  background:repeating-linear-gradient(transparent,transparent 30px,rgba(232,160,180,.08) 30px,rgba(232,160,180,.08) 31px);
-}
-.page:not(.cover)::before {
-  content:''; position:absolute; bottom:0; right:0; z-index:3;
-  border-style:solid; border-width:0 0 18px 18px;
-  border-color:transparent transparent rgba(232,160,180,.18) transparent;
-  transition:border-width .3s;
-}
-.page:not(.cover):hover::before { border-width:0 0 34px 34px; border-color:transparent transparent rgba(232,160,180,.38) transparent; }
-.page.flipped { transform:rotateY(-180deg); }
+    /* Cara frontal y trasera */
+    .p-front, .p-back {
+      position: absolute; inset: 0;
+      padding: clamp(14px,3.5vw,28px) clamp(14px,3.5vw,26px);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center; backface-visibility: hidden;
+      border-radius: 0 10px 10px 0;
+    }
+    .p-back { transform: rotateY(180deg); background: #fdf5f8; }
 
-/* frente y dorso */
-.front, .back {
-  position:absolute; inset:0;
-  padding:clamp(12px,3.5vw,26px) clamp(12px,3.5vw,24px);
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
-  text-align:center; backface-visibility:hidden; border-radius:0 10px 10px 0;
-}
-.back { transform:rotateY(180deg); background:#fdf5f8; }
+    /* Tipografía de página */
+    .p-ornament {
+      width: 44px; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      margin: 8px auto;
+    }
+    .p-quote {
+      font-size: clamp(0.84rem, 2.8vw, 1.12rem);
+      font-style: italic; color: var(--ink);
+      line-height: 1.55; margin: 6px 0;
+    }
+    .p-source {
+      font-size: clamp(0.56rem, 1.7vw, 0.7rem);
+      color: var(--rose); letter-spacing: 2px;
+      text-transform: uppercase; font-weight: 700;
+    }
+    .p-num {
+      position: absolute; bottom: 9px;
+      font-size: 0.58rem; color: rgba(60,20,40,0.26); font-style: italic;
+    }
+    .p-num.r { right: 13px; } .p-num.l { left: 13px; }
+    .p-author { font-size: 0.6rem; color: var(--rose); opacity: 0.62; margin-top: 5px; font-style: italic; }
+    .p-date   { font-size: 0.56rem; color: rgba(60,20,40,0.3); margin-top: 3px; }
+    .p-badge  {
+      font-size: 0.56rem; letter-spacing: 0.12em; text-transform: uppercase;
+      background: var(--rose); color: white; padding: 2px 9px;
+      border-radius: 20px; margin-bottom: 7px; display: inline-block;
+    }
+    .p-del {
+      position: absolute; top: 8px; right: 9px;
+      background: rgba(255,255,255,0.85);
+      border: 1.5px solid rgba(194,103,138,0.28);
+      border-radius: 50%; width: 27px; height: 27px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; line-height: 1; cursor: pointer; color: var(--rose); z-index: 5;
+      transition: background 0.2s;
+    }
+    .p-del:active { background: #fee; }
 
-.line  { width:42px; height:1px; background:linear-gradient(90deg,transparent,var(--gold),transparent); margin:7px auto; }
-.quote { font-size:clamp(.82rem,2.8vw,1.1rem); font-style:italic; color:var(--ink); line-height:1.52; margin:5px 0; }
-.src   { font-size:clamp(.55rem,1.7vw,.7rem); color:var(--rose); letter-spacing:2px; text-transform:uppercase; font-weight:700; }
-.pn    { position:absolute; bottom:9px; font-size:.58rem; color:rgba(60,20,40,.26); font-style:italic; }
-.pn.r  { right:12px; } .pn.l { left:12px; }
-.ctag  { font-size:.6rem; color:var(--rose); opacity:.6; margin-top:4px; font-style:italic; }
-.dtag  { font-size:.56rem; color:rgba(60,20,40,.3); margin-top:3px; }
-.cbadge{ font-size:.56rem; letter-spacing:.12em; text-transform:uppercase; background:var(--rose); color:white; padding:2px 9px; border-radius:20px; margin-bottom:6px; display:inline-block; }
-.del-btn {
-  position:absolute; top:8px; right:9px;
-  background:rgba(255,255,255,.85); border:1.5px solid rgba(194,103,138,.28);
-  border-radius:50%; width:27px; height:27px;
-  display:flex; align-items:center; justify-content:center;
-  font-size:.95rem; cursor:pointer; color:var(--rose); z-index:5;
-  transition:all .2s;
-}
-.del-btn:active { transform:scale(.9); }
+    /* Portada */
+    .cover {
+      background: linear-gradient(135deg, #f4b8cf, #e8839f 45%, #c2678a) !important;
+      z-index: 150; cursor: pointer; border-radius: 0 12px 12px 0;
+    }
+    .cover .p-front { background: transparent; }
+    .cover-border {
+      position: absolute; inset: 12px;
+      border: 1.5px solid rgba(255,255,255,0.3);
+      border-radius: 0 8px 8px 0;
+    }
 
-/* portada */
-.cover {
-  background:linear-gradient(135deg,#f4b8cf,#e8839f 45%,#c2678a) !important;
-  z-index:150; cursor:pointer; border-radius:0 12px 12px 0;
-}
-.cover .front { background:transparent; }
-.c-border { position:absolute; inset:12px; border:1.5px solid rgba(255,255,255,.3); border-radius:0 8px 8px 0; }
+    /* ════════════════════════════════════════
+       NAVEGACIÓN DE PÁGINAS
+    ════════════════════════════════════════ */
+    .book-nav {
+      display: flex; align-items: center; gap: 14px;
+    }
+    .nav-btn {
+      width: clamp(36px,9vw,42px); height: clamp(36px,9vw,42px);
+      border-radius: 50%;
+      border: 2px solid rgba(194,103,138,0.32);
+      background: var(--glass); backdrop-filter: blur(8px);
+      color: var(--rose); font-size: 1.05rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 3px 10px var(--sh);
+      transition: background 0.18s, color 0.18s, transform 0.15s;
+      touch-action: manipulation;
+    }
+    .nav-btn:active  { background: var(--rose); color: white; transform: scale(0.9); }
+    .nav-btn:disabled { opacity: 0.2; cursor: default; pointer-events: none; }
+    .nav-indicator {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.8rem; color: var(--ink); opacity: 0.48;
+      min-width: 54px; text-align: center;
+    }
 
-/* ─── NAV ─── */
-.nav {
-  display:flex; align-items:center; gap:12px;
-}
-.nbtn {
-  width:clamp(36px,9vw,42px); height:clamp(36px,9vw,42px);
-  border-radius:50%; border:2px solid rgba(194,103,138,.35);
-  background:rgba(255,255,255,.65); backdrop-filter:blur(8px);
-  color:var(--rose); font-size:1.1rem; cursor:pointer;
-  display:flex; align-items:center; justify-content:center;
-  box-shadow:0 3px 10px var(--sh); transition:all .18s;
-  touch-action:manipulation;
-}
-.nbtn:active { transform:scale(.9); background:var(--rose); color:white; }
-.nbtn:disabled { opacity:.2; cursor:default; }
-.pind { font-size:.8rem; color:var(--ink); opacity:.5; min-width:52px; text-align:center; font-family:'Playfair Display',serif; }
+    /* ════════════════════════════════════════
+       BARRA DE MÚSICA
+    ════════════════════════════════════════ */
+    .music-bar {
+      width: min(460px, 100%);
+      background: var(--glass); backdrop-filter: blur(14px);
+      border: 1.5px solid rgba(194,103,138,0.28);
+      border-radius: 16px;
+      padding: clamp(9px,2vw,13px) clamp(12px,3vw,18px);
+      display: flex; align-items: center; gap: 12px;
+      box-shadow: 0 3px 14px var(--sh);
+    }
+    .music-info { flex: 1; min-width: 0; }
+    .music-title {
+      font-size: clamp(0.66rem,2vw,0.8rem);
+      color: var(--rose); font-weight: 700;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .music-sub {
+      font-size: clamp(0.56rem,1.6vw,0.66rem);
+      color: var(--ink); opacity: 0.48;
+      margin-top: 2px; font-style: italic;
+    }
+    .music-controls { display: flex; gap: 7px; flex-shrink: 0; }
+    .music-btn {
+      width: 33px; height: 33px; border-radius: 50%;
+      border: 1.5px solid rgba(194,103,138,0.32);
+      background: rgba(255,255,255,0.82);
+      color: var(--rose); font-size: 0.95rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.18s, color 0.18s, transform 0.15s;
+      touch-action: manipulation;
+    }
+    .music-btn:active { background: var(--rose); color: white; transform: scale(0.9); }
 
-/* ─── MÚSICA (YouTube mini) ─── */
-.music-bar {
-  width:100%;
-  background:rgba(255,255,255,.7); backdrop-filter:blur(12px);
-  border:1.5px solid rgba(194,103,138,.3); border-radius:16px;
-  padding:clamp(8px,2vw,11px) clamp(10px,3vw,16px);
-  display:flex; align-items:center; gap:10px;
-  box-shadow:0 3px 14px var(--sh);
-}
-.mb-info { flex:1; min-width:0; }
-.mb-info .mb-title { font-size:clamp(.65rem,2vw,.78rem); color:var(--rose); font-weight:700; letter-spacing:.06em; text-transform:uppercase; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.mb-info .mb-sub   { font-size:clamp(.55rem,1.6vw,.65rem); color:var(--ink); opacity:.5; margin-top:2px; font-style:italic; }
-.mb-controls { display:flex; gap:6px; flex-shrink:0; }
-.mc {
-  width:32px; height:32px; border-radius:50%;
-  border:1.5px solid rgba(194,103,138,.35);
-  background:rgba(255,255,255,.8);
-  color:var(--rose); font-size:.95rem; cursor:pointer;
-  display:flex; align-items:center; justify-content:center;
-  transition:all .18s; touch-action:manipulation;
-}
-.mc:active { background:var(--rose); color:white; transform:scale(.9); }
-/* iframe YT oculto correctamente */
-#yt { position:fixed; bottom:-400px; left:0; width:2px; height:2px; opacity:0; pointer-events:none; }
+    /* Barra de progreso */
+    .music-progress {
+      width: 100%;
+      height: 3px; border-radius: 2px;
+      background: rgba(194,103,138,0.18);
+      margin-top: 8px; cursor: pointer; overflow: hidden;
+    }
+    .music-progress-fill {
+      height: 100%; border-radius: 2px;
+      background: linear-gradient(90deg, var(--rose-lt), var(--rose));
+      width: 0%; transition: width 0.4s linear;
+    }
 
-/* ─── BOTÓN + ─── */
-.add-btn {
-  position:fixed; bottom:clamp(14px,3vh,22px); left:clamp(14px,3vw,22px); z-index:1000;
-  width:44px; height:44px; border-radius:50%;
-  background:rgba(255,255,255,.88); backdrop-filter:blur(10px);
-  border:2px solid var(--rose); color:var(--rose);
-  font-size:1.6rem; font-weight:300; line-height:1;
-  cursor:pointer; display:none; align-items:center; justify-content:center;
-  box-shadow:0 4px 14px var(--sh); touch-action:manipulation;
-}
-.add-btn:active { background:var(--rose); color:white; transform:scale(.92); }
+    /* ════════════════════════════════════════
+       BOTÓN AGREGAR FRASE
+    ════════════════════════════════════════ */
+    .btn-add {
+      position: fixed;
+      bottom: clamp(14px,3vh,24px);
+      left:   clamp(14px,3vw,24px);
+      z-index: 500;
+      width: 44px; height: 44px; border-radius: 50%;
+      background: rgba(255,255,255,0.9); backdrop-filter: blur(10px);
+      border: 2px solid var(--rose); color: var(--rose);
+      font-size: 1.55rem; font-weight: 300; line-height: 1;
+      cursor: pointer;
+      display: none; align-items: center; justify-content: center;
+      box-shadow: 0 4px 16px var(--sh);
+      transition: background 0.2s, color 0.2s, transform 0.15s;
+      touch-action: manipulation;
+    }
+    .btn-add:active { background: var(--rose); color: white; transform: scale(0.9); }
 
-/* ─── MODALES ─── */
-.overlay {
-  position:fixed; inset:0; background:rgba(60,20,40,.45);
-  backdrop-filter:blur(6px); z-index:2000;
-  display:none; align-items:center; justify-content:center; padding:14px;
-}
-.overlay.on { display:flex; }
-.mbox {
-  background:var(--parch); border-radius:20px;
-  padding:clamp(18px,5vw,28px) clamp(16px,5vw,26px);
-  width:min(400px,100%); max-height:92vh; overflow-y:auto;
-  box-shadow:0 20px 60px rgba(60,20,40,.28);
-  animation:mIn .3s cubic-bezier(.34,1.56,.64,1) both;
-}
-@keyframes mIn { from{opacity:0;transform:scale(.88) translateY(14px)} to{opacity:1;transform:none} }
-.mbox h3 { font-family:'Playfair Display',serif; font-size:1.25rem; color:var(--rose); text-align:center; margin-bottom:4px; }
-.mbox p.sub { font-size:.76rem; color:rgba(60,20,40,.48); text-align:center; margin-bottom:16px; font-style:italic; }
-.mbox label { font-size:.72rem; color:var(--rose); letter-spacing:.09em; text-transform:uppercase; display:block; margin:11px 0 4px; }
-.mbox input, .mbox textarea {
-  width:100%; padding:9px 13px; border-radius:10px;
-  border:1.5px solid rgba(232,160,180,.48); background:white;
-  font-family:'Cormorant Garamond',serif; font-size:.98rem; color:var(--ink);
-  resize:none; outline:none; transition:border .2s; -webkit-appearance:none;
-}
-.mbox input:focus,.mbox textarea:focus { border-color:var(--rose); }
-.mbtns { display:flex; gap:9px; margin-top:16px; }
-.msave {
-  flex:1; padding:10px; border-radius:30px; border:none;
-  background:var(--rose); color:white;
-  font-family:'Playfair Display',serif; font-size:.92rem; cursor:pointer;
-  touch-action:manipulation;
-}
-.msave:active { transform:scale(.97); }
-.mcancel {
-  padding:10px 15px; border-radius:30px;
-  border:2px solid rgba(194,103,138,.38); background:transparent;
-  color:var(--rose); font-size:.86rem; cursor:pointer;
-}
-.cbox {
-  background:var(--parch); border-radius:20px; padding:24px 22px;
-  width:min(310px,100%); text-align:center;
-  box-shadow:0 20px 60px rgba(60,20,40,.28);
-  animation:mIn .3s cubic-bezier(.34,1.56,.64,1) both;
-}
-.cbox h3 { font-family:'Playfair Display',serif; color:var(--rose); font-size:1.1rem; margin-bottom:7px; }
-.cbox p  { font-size:.8rem; color:rgba(60,20,40,.58); font-style:italic; margin-bottom:16px; line-height:1.5; }
-.cbtns   { display:flex; gap:9px; justify-content:center; }
-.cyes { padding:9px 20px; border-radius:30px; border:none; background:var(--rose); color:white; font-size:.9rem; cursor:pointer; }
-.cno  { padding:9px 16px; border-radius:30px; border:2px solid rgba(194,103,138,.38); background:transparent; color:var(--rose); font-size:.86rem; cursor:pointer; }
+    /* ════════════════════════════════════════
+       MODALES
+    ════════════════════════════════════════ */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(58,42,53,0.46); backdrop-filter: blur(7px);
+      z-index: 1000;
+      display: none; align-items: center; justify-content: center;
+      padding: 16px;
+    }
+    .overlay.visible { display: flex; }
 
-/* ─── TOAST ─── */
-.toast {
-  position:fixed; bottom:70px; left:50%; transform:translateX(-50%) translateY(10px);
-  background:var(--rose); color:white; padding:8px 20px;
-  border-radius:30px; font-size:.8rem; z-index:3000;
-  opacity:0; transition:all .35s; pointer-events:none; white-space:nowrap;
-}
-.toast.on { opacity:1; transform:translateX(-50%) translateY(0); }
+    .modal-box {
+      background: var(--parch); border-radius: 22px;
+      padding: clamp(20px,5vw,32px) clamp(18px,5vw,28px);
+      width: min(420px, 100%); max-height: 92vh; overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(58,42,53,0.28);
+      animation: slideUp 0.32s cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: scale(0.88) translateY(16px); }
+      to   { opacity: 1; transform: none; }
+    }
+    .modal-box h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem; color: var(--rose);
+      text-align: center; margin-bottom: 4px;
+    }
+    .modal-box .modal-sub {
+      font-size: 0.76rem; color: rgba(58,42,53,0.48);
+      text-align: center; margin-bottom: 18px; font-style: italic;
+    }
+    .modal-box label {
+      font-size: 0.72rem; color: var(--rose);
+      letter-spacing: 0.09em; text-transform: uppercase;
+      display: block; margin: 12px 0 4px;
+    }
+    .modal-box input,
+    .modal-box textarea {
+      width: 100%; padding: 10px 14px; border-radius: 11px;
+      border: 1.5px solid rgba(232,160,180,0.46); background: white;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem; color: var(--ink);
+      resize: none; outline: none;
+      transition: border-color 0.2s;
+      -webkit-appearance: none;
+    }
+    .modal-box input:focus,
+    .modal-box textarea:focus { border-color: var(--rose); }
+    .modal-actions { display: flex; gap: 10px; margin-top: 18px; }
+    .btn-save {
+      flex: 1; padding: 11px; border-radius: 30px; border: none;
+      background: var(--rose); color: white;
+      font-family: 'Playfair Display', serif;
+      font-size: 0.95rem; cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .btn-save:active { transform: scale(0.97); }
+    .btn-cancel {
+      padding: 11px 17px; border-radius: 30px;
+      border: 2px solid rgba(194,103,138,0.36); background: transparent;
+      color: var(--rose); font-size: 0.88rem; cursor: pointer;
+    }
 
-.fh { position:fixed; font-size:1.3rem; pointer-events:none; z-index:99; animation:fup 2s ease-out forwards; }
-@keyframes fup { 0%{transform:translateY(0) scale(1);opacity:1} 100%{transform:translateY(-50vh) scale(.3);opacity:0} }
-@keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
-@keyframes blink  { 0%,100%{opacity:.5} 50%{opacity:1} }
-</style>
+    /* Modal confirmar eliminar */
+    .confirm-box {
+      background: var(--parch); border-radius: 22px;
+      padding: 28px 24px; width: min(320px,100%);
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(58,42,53,0.28);
+      animation: slideUp 0.28s cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+    .confirm-box h3 { font-family: 'Playfair Display', serif; color: var(--rose); font-size: 1.15rem; margin-bottom: 8px; }
+    .confirm-box p  { font-size: 0.82rem; color: rgba(58,42,53,0.58); font-style: italic; margin-bottom: 20px; line-height: 1.5; }
+    .confirm-actions { display: flex; gap: 10px; justify-content: center; }
+    .btn-confirm-yes { padding: 10px 22px; border-radius: 30px; border: none; background: var(--rose); color: white; font-size: 0.92rem; cursor: pointer; }
+    .btn-confirm-no  { padding: 10px 18px; border-radius: 30px; border: 2px solid rgba(194,103,138,0.36); background: transparent; color: var(--rose); font-size: 0.88rem; cursor: pointer; }
+
+    /* ════════════════════════════════════════
+       TOAST
+    ════════════════════════════════════════ */
+    .toast {
+      position: fixed; bottom: 72px; left: 50%;
+      transform: translateX(-50%) translateY(12px);
+      background: var(--rose); color: white;
+      padding: 9px 22px; border-radius: 30px;
+      font-size: 0.82rem; z-index: 2000;
+      opacity: 0; pointer-events: none; white-space: nowrap;
+      transition: opacity 0.32s ease, transform 0.32s ease;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ════════════════════════════════════════
+       CORAZONES FLOTANTES
+    ════════════════════════════════════════ */
+    .floating-heart {
+      position: fixed; pointer-events: none; z-index: 999;
+      font-size: 1.3rem;
+      animation: floatUp 2.2s ease-out forwards;
+    }
+    @keyframes floatUp {
+      0%   { transform: translateY(0) scale(1); opacity: 1; }
+      100% { transform: translateY(-55vh) scale(0.3); opacity: 0; }
+    }
+
+    /* ════════════════════════════════════════
+       ANIMACIONES DE PORTADA
+    ════════════════════════════════════════ */
+    @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+    @keyframes blink { 0%,100% { opacity: 0.5; } 50% { opacity: 1; } }
+  </style>
 </head>
 <body>
 
-<canvas id="bg"></canvas>
+  <!-- Partículas de fondo -->
+  <canvas id="bg-canvas"></canvas>
 
-<div class="wrap" id="wrap">
+  <!-- Layout principal -->
+  <div class="app">
 
-  <!-- CONTADOR -->
-  <div class="counter">
-    <div>Llevamos <b id="days">0</b> días · <b id="hms">00h 00m 00s</b></div>
-    <small id="since"></small>
-  </div>
-
-  <!-- LIBRO -->
-  <div class="book-scene">
-    <div class="book">
-      <div class="spine">
-        <div class="spine-dot" style="top:22%"></div>
-        <div class="spine-dot" style="top:50%"></div>
-        <div class="spine-dot" style="top:78%"></div>
-      </div>
-      <div id="pc"></div>
-      <!-- PORTADA -->
-      <div class="page cover" id="cover" onclick="openBook()" style="z-index:150">
-        <div class="c-border"></div>
-        <div class="front">
-          <div style="font-size:clamp(1.4rem,4.5vw,1.9rem);margin-bottom:8px;animation:pulse 2.5s ease-in-out infinite">💖</div>
-          <h2 style="font-family:'Playfair Display';font-size:clamp(1.4rem,5vw,1.9rem);color:white;font-style:italic;text-shadow:0 2px 8px rgba(60,20,40,.3)">Para Ti</h2>
-          <p style="margin-top:7px;font-style:italic;color:rgba(255,255,255,.85);font-size:clamp(.75rem,2.4vw,.92rem)">Nuestra historia en cada página</p>
-          <div style="margin-top:clamp(14px,3vh,24px);font-size:clamp(.52rem,1.7vw,.64rem);letter-spacing:3px;color:rgba(255,255,255,.68);animation:blink 2s ease-in-out infinite">✦ TOCA PARA ABRIR ✦</div>
+    <!-- ── CONTADOR ── -->
+    <div class="counter">
+      <div class="counter-main">
+        <div class="counter-unit">
+          <span class="counter-val" id="c-years">0</span>
+          <span class="counter-lbl">años</span>
+        </div>
+        <span class="counter-sep">·</span>
+        <div class="counter-unit">
+          <span class="counter-val" id="c-months">0</span>
+          <span class="counter-lbl">meses</span>
+        </div>
+        <span class="counter-sep">·</span>
+        <div class="counter-unit">
+          <span class="counter-val" id="c-days">0</span>
+          <span class="counter-lbl">días</span>
+        </div>
+        <span class="counter-sep">·</span>
+        <div class="counter-unit">
+          <span class="counter-val" id="c-hours">0</span>
+          <span class="counter-lbl">horas</span>
         </div>
       </div>
+      <div class="counter-since" id="c-since"></div>
+    </div>
+
+    <!-- ── LIBRO ── -->
+    <div class="book-scene">
+      <div class="book">
+
+        <!-- Lomo -->
+        <div class="spine">
+          <div class="spine-dot" style="top:22%"></div>
+          <div class="spine-dot" style="top:50%"></div>
+          <div class="spine-dot" style="top:78%"></div>
+        </div>
+
+        <!-- Páginas (se generan con JS) -->
+        <div id="pages-root"></div>
+
+        <!-- Portada (siempre encima) -->
+        <div class="page cover" id="cover" onclick="openBook()" style="z-index:150">
+          <div class="cover-border"></div>
+          <div class="p-front">
+            <div style="font-size:clamp(1.5rem,5vw,2rem);margin-bottom:10px;animation:pulse 2.5s ease-in-out infinite">💖</div>
+            <h2 style="font-family:'Playfair Display';font-size:clamp(1.5rem,5vw,2rem);color:white;font-style:italic;text-shadow:0 2px 10px rgba(58,42,53,0.28);line-height:1.2">Para Ti</h2>
+            <p style="margin-top:9px;font-style:italic;color:rgba(255,255,255,0.84);font-size:clamp(0.78rem,2.4vw,0.94rem)">Nuestra historia en cada página</p>
+            <div style="margin-top:clamp(16px,3vh,26px);font-size:clamp(0.53rem,1.7vw,0.63rem);letter-spacing:3px;color:rgba(255,255,255,0.66);animation:blink 2.2s ease-in-out infinite">✦ TOCA PARA ABRIR ✦</div>
+          </div>
+        </div>
+
+      </div><!-- /book -->
+    </div><!-- /book-scene -->
+
+    <!-- ── NAVEGACIÓN ── -->
+    <div class="book-nav" id="book-nav" style="display:none">
+      <button class="nav-btn" id="btn-prev" onclick="prevPage()">←</button>
+      <div class="nav-indicator" id="nav-indicator">1 / 1</div>
+      <button class="nav-btn" id="btn-next" onclick="nextPage()">→</button>
+    </div>
+
+    <!-- ── MÚSICA ── -->
+    <div class="music-bar" id="music-bar" style="display:none">
+      <div class="music-info">
+        <div class="music-title" id="music-title">♩ The Reason</div>
+        <div class="music-sub">nuestra playlist</div>
+        <div class="music-progress" id="music-progress" onclick="seekMusic(event)">
+          <div class="music-progress-fill" id="music-progress-fill"></div>
+        </div>
+      </div>
+      <div class="music-controls">
+        <button class="music-btn" onclick="prevTrack()" title="Anterior">⟨</button>
+        <button class="music-btn" id="btn-play" onclick="togglePlay()">▷</button>
+        <button class="music-btn" onclick="nextTrack()" title="Siguiente">⟩</button>
+      </div>
+    </div>
+
+  </div><!-- /app -->
+
+  <!-- Elemento de audio nativo -->
+  <audio id="audio-player" preload="none"></audio>
+
+  <!-- Botón agregar frase -->
+  <button class="btn-add" id="btn-add" onclick="openAddModal()" title="Escribir en el libro">+</button>
+
+  <!-- ── MODAL AGREGAR FRASE ── -->
+  <div class="overlay" id="overlay-add" onclick="handleOverlayClick(event,'overlay-add')">
+    <div class="modal-box">
+      <h3>✦ Escribir en el libro</h3>
+      <p class="modal-sub">Tu frase quedará guardada para siempre en estas páginas</p>
+      <label>Tu frase o mensaje *</label>
+      <textarea id="input-quote" rows="3" placeholder='"Lo que siento por ti no tiene nombre..."'></textarea>
+      <label>Tu nombre</label>
+      <input id="input-author" type="text" placeholder="Ej: Ana, Carlos...">
+      <label>Libro o fuente <span style="opacity:0.42;font-size:0.68rem">(opcional)</span></label>
+      <input id="input-book" type="text" placeholder="Ej: Nuestro diario, Mi corazón...">
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeAddModal()">Cancelar</button>
+        <button class="btn-save"   onclick="saveQuote()">Guardar 💖</button>
+      </div>
     </div>
   </div>
 
-  <!-- NAV -->
-  <div class="nav" id="nav" style="display:none">
-    <button class="nbtn" id="bp" onclick="prevPage()">←</button>
-    <div class="pind" id="pi">1 / 1</div>
-    <button class="nbtn" id="bn" onclick="nextPage()">→</button>
-  </div>
-
-  <!-- Audio oculto — archive.org, sin anuncios, canciones completas -->
-  <audio id="player" preload="none"></audio>
-
-  <!-- MÚSICA -->
-  <div class="music-bar" id="mbar" style="display:none">
-    <div class="mb-info">
-      <div class="mb-title" id="mt">♩ The Reason</div>
-      <div class="mb-sub">nuestra playlist</div>
-    </div>
-    <div class="mb-controls">
-      <button class="mc" onclick="prevT()">⟨</button>
-      <button class="mc" id="pp" onclick="togglePlay()">▷</button>
-      <button class="mc" onclick="nextT()">⟩</button>
+  <!-- ── MODAL CONFIRMAR ELIMINAR ── -->
+  <div class="overlay" id="overlay-confirm" onclick="handleOverlayClick(event,'overlay-confirm')">
+    <div class="confirm-box">
+      <h3>¿Eliminar esta frase?</h3>
+      <p id="confirm-text"></p>
+      <div class="confirm-actions">
+        <button class="btn-confirm-no"  onclick="closeConfirmModal()">Cancelar</button>
+        <button class="btn-confirm-yes" onclick="confirmDelete()">Eliminar</button>
+      </div>
     </div>
   </div>
 
-</div><!-- /wrap -->
-
-<!-- (sin iframe externo — audio nativo) -->
-
-<!-- Botón agregar -->
-<button class="add-btn" id="ab" onclick="openModal()">+</button>
-
-<!-- Modal agregar -->
-<div class="overlay" id="mo">
-  <div class="mbox">
-    <h3>✦ Escribir en el libro</h3>
-    <p class="sub">Tu frase quedará guardada para siempre</p>
-    <label>Tu frase o mensaje</label>
-    <textarea id="iq" rows="3" placeholder='"Lo que siento por ti..."'></textarea>
-    <label>De parte de</label>
-    <input id="ia" type="text" placeholder="Tu nombre">
-    <label>Fuente <span style="opacity:.45;font-size:.68rem">(opcional)</span></label>
-    <input id="ib" type="text" placeholder="Nuestro diario...">
-    <div class="mbtns">
-      <button class="mcancel" onclick="closeModal()">Cancelar</button>
-      <button class="msave"   onclick="saveQuote()">Guardar 💖</button>
-    </div>
-  </div>
-</div>
-
-<!-- Modal eliminar -->
-<div class="overlay" id="co">
-  <div class="cbox">
-    <h3>¿Eliminar esta frase?</h3>
-    <p id="cp"></p>
-    <div class="cbtns">
-      <button class="cno"  onclick="closeConfirm()">Cancelar</button>
-      <button class="cyes" onclick="deleteQuote()">Eliminar</button>
-    </div>
-  </div>
-</div>
-
-<div class="toast" id="toast"></div>
+  <!-- Toast de notificaciones -->
+  <div class="toast" id="toast"></div>
 
 <script>
-// ══════════════════════════════════════════════
-// CANCIONES — agrega o cambia IDs de YouTube aquí
-// El ID es lo que va después de ?v= en el link
-// ══════════════════════════════════════════════
-const TRACKS = [
-  { title:"The Reason",  id:"fV4DiAyExN0" },  // Hoobastank
-  { title:"Wonderwall",  id:"bx1Bh8ZvH84" },  // Oasis
+'use strict';
+
+/* ════════════════════════════════════════════════════════
+   CONFIGURACIÓN
+════════════════════════════════════════════════════════ */
+
+/** Fecha de inicio de la relación */
+const START_DATE = new Date('2024-12-13T00:00:00');
+
+/**
+ * PLAYLIST — Archive.org MP3 (sin anuncios, canciones completas)
+ * Para agregar canciones: ve a archive.org, busca la canción,
+ * copia el link del botón "VBR MP3 download" y agrégalo aquí.
+ */
+const PLAYLIST = [
+  {
+    title: 'The Reason',
+    url:   'https://archive.org/download/EnglishSongs_43/Hoobastank%20-%20The%20Reason'
+  },
+  {
+    title: 'Wonderwall',
+    url:   'https://archive.org/download/mp-3-dl.-cc-wonderwall-320k/%5BMP3DL.CC%5D%20Wonderwall-320k.mp3'
+  },
 ];
 
-// ══════════════════════════════════════════════
-// PÁGINAS FIJAS
-// ══════════════════════════════════════════════
-const FIXED = [
-  { q:"No importa lo que pase mañana, te quiero hoy.",                               s:"Nuestro Camino Eterno" },
-  { q:"¿Me amas? ¿Real o no real? —Real.",                                           s:"Los Juegos del Hambre" },
-  { q:"Eres lo único que me hace sentir seguro en este mundo.",                       s:"Los Juegos del Hambre" },
-  { q:"Ella no me necesita. Y yo... yo no puedo vivir sin ella.",                     s:"Los Juegos del Hambre" },
-  { q:"—Buenas noches, Liam. —Buenas noches, supernova.",                            s:"Hasta que nos quedemos sin estrellas" },
-  { q:"No quiero que me bajen la luna, quiero que alguien se siente a verla conmigo.",s:"Hasta que nos quedemos sin estrellas" },
-  { q:"Aprendí que el hogar no es un lugar, es una persona. Y mi hogar eres tú.",    s:"Hasta que nos quedemos sin estrellas" },
-  { q:"Rompe mi corazón si quieres, pero no te vayas. Nunca lo hagas.",              s:"Boulevard" },
-  { q:"Ahora sé que la droga más fuerte de un ser humano es otro ser humano.",       s:"Boulevard" },
-  { q:"Luke era el sol y yo la luna, y en un mundo perfecto, el eclipse sería eterno.",s:"Boulevard" },
-  { q:"—Sí, me gusta —sonreí—. Tú me gustas.",                                      s:"Boulevard" },
-  { q:"Si el mundo se acaba hoy, me gustaría que me encontrara a tu lado.",          s:"Boulevard" },
+/** Páginas fijas del libro */
+const FIXED_PAGES = [
+  { quote: 'No importa lo que pase mañana, te quiero hoy.',                                source: 'Nuestro Camino Eterno' },
+  { quote: '¿Me amas? ¿Real o no real? —Real.',                                            source: 'Los Juegos del Hambre' },
+  { quote: 'Eres lo único que me hace sentir seguro en este mundo.',                        source: 'Los Juegos del Hambre' },
+  { quote: 'Ella no me necesita. Y yo... yo no puedo vivir sin ella.',                      source: 'Los Juegos del Hambre' },
+  { quote: '—Buenas noches, Liam. —Buenas noches, supernova.',                             source: 'Hasta que nos quedemos sin estrellas' },
+  { quote: 'No quiero que me bajen la luna, quiero que alguien se siente a verla conmigo.', source: 'Hasta que nos quedemos sin estrellas' },
+  { quote: 'Aprendí que el hogar no es un lugar, es una persona. Y mi hogar eres tú.',     source: 'Hasta que nos quedemos sin estrellas' },
+  { quote: 'Rompe mi corazón si quieres, pero no te vayas. Nunca lo hagas.',               source: 'Boulevard' },
+  { quote: 'Ahora sé que la droga más fuerte de un ser humano es otro ser humano.',        source: 'Boulevard' },
+  { quote: 'Luke era el sol y yo la luna, y en un mundo perfecto, el eclipse sería eterno.', source: 'Boulevard' },
+  { quote: '—Sí, me gusta —sonreí—. Tú me gustas.',                                       source: 'Boulevard' },
+  { quote: 'Si el mundo se acaba hoy, me gustaría que me encontrara a tu lado.',           source: 'Boulevard' },
 ];
 
-// ══════════════════════════════════════════════
-// ESTADO
-// ══════════════════════════════════════════════
-const ANN = new Date("2024-12-13T00:00:00");
-let pages=[], cur=-1, open=false, flipping=false;
+/* ════════════════════════════════════════════════════════
+   ESTADO GLOBAL
+════════════════════════════════════════════════════════ */
+let pages        = [];   // Array de elementos DOM de páginas
+let currentPage  = -1;   // Índice de página activa (-1 = portada)
+let isOpen       = false; // Libro abierto
+let isFlipping   = false; // Animación en curso
+let trackIndex   = 0;    // Canción actual
+let pendingDelete = -1;   // Índice de frase a eliminar
 
-// ══════════════════════════════════════════════
-// PÁGINAS
-// ══════════════════════════════════════════════
-function loadQ() { try{return JSON.parse(localStorage.getItem('lf')||'[]')}catch{return[]} }
-function saveQ(a) { localStorage.setItem('lf',JSON.stringify(a)); }
+/* ════════════════════════════════════════════════════════
+   CONSTRUCCIÓN DEL LIBRO
+════════════════════════════════════════════════════════ */
+function loadCustomQuotes() {
+  try { return JSON.parse(localStorage.getItem('amor_frases') || '[]'); }
+  catch { return []; }
+}
 
-function build() {
-  const c=document.getElementById('pc');
-  c.innerHTML=''; pages=[];
-  const all=[...FIXED,...loadQ()];
-  all.forEach((q,i)=>{
-    const custom=i>=FIXED.length;
-    const ds=custom&&q.t?new Date(q.t).toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'}):'';
-    const p=document.createElement('div');
-    p.className='page'; p.style.zIndex=all.length-i;
-    p.innerHTML=`
-      <div class="front">
-        ${custom?'<div class="cbadge">✦ Escrito por nosotros ✦</div>':''}
-        <div class="line"></div>
-        <p class="quote">"${q.q}"</p>
-        <div class="line"></div>
-        <span class="src">${q.s||''}</span>
-        ${custom&&q.a?`<div class="ctag">— ${q.a}</div>`:''}
-        ${custom&&ds?`<div class="dtag">${ds}</div>`:''}
-        ${custom?`<button class="del-btn" onclick="confirmDel(${i-FIXED.length})">×</button>`:''}
-        <div class="pn r">Pág. ${(i+1)*2-1}</div>
+function saveCustomQuotes(arr) {
+  localStorage.setItem('amor_frases', JSON.stringify(arr));
+}
+
+function buildBook() {
+  const root   = document.getElementById('pages-root');
+  root.innerHTML = '';
+  pages = [];
+
+  const custom = loadCustomQuotes();
+  const all    = [...FIXED_PAGES, ...custom];
+
+  all.forEach((item, i) => {
+    const isCustom = i >= FIXED_PAGES.length;
+    const dateStr  = isCustom && item.savedAt
+      ? new Date(item.savedAt).toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' })
+      : '';
+
+    const page = document.createElement('div');
+    page.className = 'page';
+    page.style.zIndex = all.length - i;
+
+    page.innerHTML = `
+      <div class="p-front">
+        ${isCustom ? '<div class="p-badge">✦ Escrito por nosotros ✦</div>' : ''}
+        <div class="p-ornament"></div>
+        <p class="p-quote">"${escapeHTML(item.quote)}"</p>
+        <div class="p-ornament"></div>
+        <span class="p-source">${escapeHTML(item.source || item.book || '')}</span>
+        ${isCustom && item.author ? `<div class="p-author">— ${escapeHTML(item.author)}</div>` : ''}
+        ${isCustom && dateStr     ? `<div class="p-date">${dateStr}</div>` : ''}
+        ${isCustom ? `<button class="p-del" onclick="openDeleteModal(${i - FIXED_PAGES.length})">×</button>` : ''}
+        <div class="p-num r">Pág. ${(i + 1) * 2 - 1}</div>
       </div>
-      <div class="back">
-        <div class="line"></div>
-        <div style="font-size:1.3rem;margin:5px 0">💖</div>
-        <div style="font-size:.74rem;font-style:italic;color:rgba(60,20,40,.36)">Con amor, siempre</div>
-        <div class="line"></div>
-        <div class="pn l">Pág. ${(i+1)*2}</div>
+      <div class="p-back">
+        <div class="p-ornament"></div>
+        <div style="font-size:1.4rem;margin:6px 0">💖</div>
+        <div style="font-size:0.76rem;font-style:italic;color:rgba(58,42,53,0.36)">Con amor, siempre</div>
+        <div class="p-ornament"></div>
+        <div class="p-num l">Pág. ${(i + 1) * 2}</div>
       </div>`;
-    c.appendChild(p); pages.push(p);
+
+    root.appendChild(page);
+    pages.push(page);
   });
 }
 
-// ══════════════════════════════════════════════
-// NAVEGACIÓN
-// ══════════════════════════════════════════════
-function nav() {
-  document.getElementById('bp').disabled = cur<=0;
-  document.getElementById('bn').disabled = cur>=pages.length-1;
-  document.getElementById('pi').textContent = `${cur+1} / ${pages.length}`;
+function escapeHTML(str) {
+  return String(str)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;');
+}
+
+/* ════════════════════════════════════════════════════════
+   NAVEGACIÓN DEL LIBRO
+════════════════════════════════════════════════════════ */
+function updateNav() {
+  document.getElementById('btn-prev').disabled    = currentPage <= 0;
+  document.getElementById('btn-next').disabled    = currentPage >= pages.length - 1;
+  document.getElementById('nav-indicator').textContent = `${currentPage + 1} / ${pages.length}`;
 }
 
 function openBook() {
-  if(open) return; open=true;
+  if (isOpen) return;
+  isOpen = true;
+
   document.getElementById('cover').classList.add('flipped');
-  document.getElementById('nav').style.display='flex';
-  document.getElementById('ab').style.display='flex';
-  document.getElementById('mbar').style.display='flex';
-  loadTrack(0, false); // carga la primera canción lista para tocar
-  setTimeout(()=>go(0), 700);
+  document.getElementById('book-nav').style.display  = 'flex';
+  document.getElementById('btn-add').style.display   = 'flex';
+  document.getElementById('music-bar').style.display = 'flex';
+
+  // Precargar primera canción
+  loadTrack(0, false);
+
+  setTimeout(() => goToPage(0), 720);
 }
 
-function go(t) {
-  if(flipping||t===cur) return;
-  if(t<0||t>=pages.length) return;
-  flipping=true;
-  const steps=[];
-  if(t>cur) for(let i=cur+1;i<=t;i++) steps.push({el:pages[i],f:true});
-  else       for(let i=cur;i>t;i--)   steps.push({el:pages[i],f:false});
-  let s=0;
-  const run=()=>{
-    if(s>=steps.length){ cur=t; nav(); flipping=false; return; }
-    const {el,f}=steps[s++];
-    f?el.classList.add('flipped'):el.classList.remove('flipped');
-    setTimeout(run, steps.length===1?0:115);
+function goToPage(target) {
+  if (isFlipping || target === currentPage) return;
+  if (target < 0 || target >= pages.length)  return;
+
+  isFlipping = true;
+
+  // Construir lista de pasos — garantiza orden correcto
+  const steps = [];
+  if (target > currentPage) {
+    for (let i = currentPage + 1; i <= target; i++) steps.push({ el: pages[i], flip: true });
+  } else {
+    for (let i = currentPage; i > target; i--)     steps.push({ el: pages[i], flip: false });
+  }
+
+  let step = 0;
+  const run = () => {
+    if (step >= steps.length) {
+      currentPage = target;
+      updateNav();
+      isFlipping = false;
+      return;
+    }
+    const { el, flip } = steps[step++];
+    flip ? el.classList.add('flipped') : el.classList.remove('flipped');
+    // Si hay más de un paso, esperar a que termine la transición antes del siguiente
+    setTimeout(run, steps.length === 1 ? 0 : 118);
   };
   run();
 }
-function nextPage(){ if(!flipping) go(cur+1); }
-function prevPage(){ if(!flipping) go(cur-1); }
 
-document.addEventListener('keydown',e=>{
-  if(!open)return;
-  if(e.key==='ArrowRight'||e.key==='ArrowDown') nextPage();
-  if(e.key==='ArrowLeft' ||e.key==='ArrowUp')   prevPage();
-});
-let tx=0;
-document.addEventListener('touchstart',e=>{tx=e.touches[0].clientX;},{passive:true});
-document.addEventListener('touchend',e=>{
-  if(!open)return;
-  const dx=e.changedTouches[0].clientX-tx;
-  if(dx<-44) nextPage();
-  if(dx> 44) prevPage();
+function nextPage() { if (!isFlipping) goToPage(currentPage + 1); }
+function prevPage() { if (!isFlipping) goToPage(currentPage - 1); }
+
+// Teclado
+document.addEventListener('keydown', e => {
+  if (!isOpen) return;
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') nextPage();
+  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   prevPage();
 });
 
-// ══════════════════════════════════════════════
-// FRASES
-// ══════════════════════════════════════════════
-function openModal(){
-  ['iq','ia','ib'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('mo').classList.add('on');
-}
-function closeModal(){ document.getElementById('mo').classList.remove('on'); }
+// Swipe táctil
+let touchStartX = 0;
+document.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
+document.addEventListener('touchend', e => {
+  if (!isOpen) return;
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  if (dx < -44) nextPage();
+  if (dx >  44) prevPage();
+});
 
-function saveQuote(){
-  const q=document.getElementById('iq').value.trim();
-  const a=document.getElementById('ia').value.trim();
-  const b=document.getElementById('ib').value.trim();
-  if(!q){document.getElementById('iq').focus();return;}
-  const arr=loadQ();
-  arr.push({q,a,s:b||'Nuestro libro',t:Date.now()});
-  saveQ(arr); closeModal(); build();
-  setTimeout(()=>go(pages.length-1),350);
-  toast('✦ Frase guardada en el libro 💖'); hearts();
-}
-
-let pdIdx=-1;
-function confirmDel(i){
-  pdIdx=i;
-  const q=loadQ()[i];
-  document.getElementById('cp').textContent=q?`"${q.q.slice(0,55)}${q.q.length>55?'...':''}"`:'';
-  document.getElementById('co').classList.add('on');
-}
-function closeConfirm(){ document.getElementById('co').classList.remove('on'); pdIdx=-1; }
-function deleteQuote(){
-  if(pdIdx<0)return;
-  const arr=loadQ(); arr.splice(pdIdx,1); saveQ(arr); closeConfirm();
-  const ni=Math.min(cur,FIXED.length+arr.length-1);
-  cur=-1; build();
-  for(let i=0;i<=ni;i++) pages[i]?.classList.add('flipped');
-  cur=ni; nav(); toast('Frase eliminada');
+/* ════════════════════════════════════════════════════════
+   FRASES PERSONALIZADAS
+════════════════════════════════════════════════════════ */
+function openAddModal() {
+  ['input-quote', 'input-author', 'input-book'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('overlay-add').classList.add('visible');
 }
 
-document.getElementById('mo').addEventListener('click',function(e){if(e.target===this)closeModal();});
-document.getElementById('co').addEventListener('click',function(e){if(e.target===this)closeConfirm();});
-
-function toast(m){
-  const t=document.getElementById('toast');
-  t.textContent=m; t.classList.add('on');
-  setTimeout(()=>t.classList.remove('on'),2500);
-}
-function hearts(){
-  ['💖','💗','💕','🌹','✨'].forEach((e,i)=>setTimeout(()=>{
-    const el=document.createElement('div'); el.className='fh';
-    el.textContent=e; el.style.left=(18+Math.random()*64)+'vw'; el.style.bottom='16vh';
-    document.body.appendChild(el); setTimeout(()=>el.remove(),2100);
-  },i*100));
+function closeAddModal() {
+  document.getElementById('overlay-add').classList.remove('visible');
 }
 
-// ══════════════════════════════════════════════
-// MÚSICA — archive.org MP3, sin anuncios, completas
-// Para agregar canciones añade entradas a TRACKS
-// con el link directo del MP3 de archive.org
-// ══════════════════════════════════════════════
-const TRACKS = [
-  {
-    title: "The Reason",
-    url: "https://archive.org/download/EnglishSongs_43/Hoobastank%20-%20The%20Reason"
-  },
-  {
-    title: "Wonderwall",
-    url: "https://archive.org/download/mp-3-dl.-cc-wonderwall-320k/%5BMP3DL.CC%5D%20Wonderwall-320k.mp3"
-  },
-];
+function saveQuote() {
+  const quote  = document.getElementById('input-quote').value.trim();
+  const author = document.getElementById('input-author').value.trim();
+  const book   = document.getElementById('input-book').value.trim();
 
-let tIdx=0, playing=false;
-const player = document.getElementById('player');
+  if (!quote) {
+    document.getElementById('input-quote').focus();
+    return;
+  }
 
-player.addEventListener('ended', () => nextT());
-player.addEventListener('play',  () => { playing=true;  setIcon('⏸'); });
-player.addEventListener('pause', () => { playing=false; setIcon('▷'); });
+  const quotes = loadCustomQuotes();
+  quotes.push({ quote, author, source: book || 'Nuestro libro', book, savedAt: Date.now() });
+  saveCustomQuotes(quotes);
 
-function setIcon(ic){ document.getElementById('pp').textContent = ic; }
-function setTitle(i){ document.getElementById('mt').textContent = '♩ ' + TRACKS[i].title; }
+  closeAddModal();
+  buildBook();
+  setTimeout(() => goToPage(pages.length - 1), 380);
+  showToast('✦ Frase guardada en el libro 💖');
+  spawnHearts();
+}
 
-function loadTrack(i, autoplay) {
-  tIdx = i;
-  player.src = TRACKS[i].url;
-  setTitle(i);
-  if (autoplay) player.play().catch(()=>{});
+function openDeleteModal(customIndex) {
+  pendingDelete = customIndex;
+  const quotes = loadCustomQuotes();
+  const q = quotes[customIndex];
+  const preview = q ? `"${q.quote.slice(0, 58)}${q.quote.length > 58 ? '…' : ''}"` : '';
+  document.getElementById('confirm-text').textContent = preview;
+  document.getElementById('overlay-confirm').classList.add('visible');
+}
+
+function closeConfirmModal() {
+  document.getElementById('overlay-confirm').classList.remove('visible');
+  pendingDelete = -1;
+}
+
+function confirmDelete() {
+  if (pendingDelete < 0) return;
+  const quotes = loadCustomQuotes();
+  quotes.splice(pendingDelete, 1);
+  saveCustomQuotes(quotes);
+  closeConfirmModal();
+
+  // Reposicionar sin saltar
+  const newTarget = Math.min(currentPage, FIXED_PAGES.length + quotes.length - 1);
+  currentPage = -1;
+  buildBook();
+  for (let i = 0; i <= newTarget; i++) pages[i]?.classList.add('flipped');
+  currentPage = newTarget;
+  updateNav();
+  showToast('Frase eliminada del libro');
+}
+
+// Cerrar modal tocando el fondo
+function handleOverlayClick(event, overlayId) {
+  if (event.target.id === overlayId) {
+    if (overlayId === 'overlay-add')     closeAddModal();
+    if (overlayId === 'overlay-confirm') closeConfirmModal();
+  }
+}
+
+/* ════════════════════════════════════════════════════════
+   MÚSICA — Archive.org, nativa, sin anuncios
+════════════════════════════════════════════════════════ */
+const audioPlayer = document.getElementById('audio-player');
+
+audioPlayer.addEventListener('ended',         () => nextTrack());
+audioPlayer.addEventListener('timeupdate',    updateProgress);
+audioPlayer.addEventListener('play',          () => setPlayIcon('⏸'));
+audioPlayer.addEventListener('pause',         () => setPlayIcon('▷'));
+
+function setPlayIcon(icon) {
+  document.getElementById('btn-play').textContent = icon;
+}
+
+function updateProgress() {
+  if (!audioPlayer.duration) return;
+  const pct = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+  document.getElementById('music-progress-fill').style.width = pct + '%';
+}
+
+function loadTrack(index, autoplay) {
+  trackIndex = ((index % PLAYLIST.length) + PLAYLIST.length) % PLAYLIST.length;
+  audioPlayer.src = PLAYLIST[trackIndex].url;
+  document.getElementById('music-title').textContent = '♩ ' + PLAYLIST[trackIndex].title;
+  document.getElementById('music-progress-fill').style.width = '0%';
+  if (autoplay) audioPlayer.play().catch(() => {});
 }
 
 function togglePlay() {
-  if (player.paused) player.play().catch(()=>{});
-  else player.pause();
+  if (audioPlayer.paused) audioPlayer.play().catch(() => {});
+  else audioPlayer.pause();
 }
-function nextT() { loadTrack((tIdx+1) % TRACKS.length, true); }
-function prevT() { loadTrack((tIdx-1+TRACKS.length) % TRACKS.length, true); }
 
-// ══════════════════════════════════════════════
-// CONTADOR
-// ══════════════════════════════════════════════
-function tick(){
-  const d=new Date()-ANN; if(d<0)return;
-  document.getElementById('days').textContent=Math.floor(d/86400000);
-  const h=Math.floor((d%86400000)/3600000);
-  const m=Math.floor((d%3600000)/60000);
-  const sec=Math.floor((d%60000)/1000);
-  document.getElementById('hms').textContent=
-    `${String(h).padStart(2,'0')}h ${String(m).padStart(2,'0')}m ${String(sec).padStart(2,'0')}s`;
+function nextTrack() { loadTrack(trackIndex + 1, !audioPlayer.paused); }
+function prevTrack() { loadTrack(trackIndex - 1, !audioPlayer.paused); }
+
+function seekMusic(event) {
+  if (!audioPlayer.duration) return;
+  const rect = event.currentTarget.getBoundingClientRect();
+  const pct  = (event.clientX - rect.left) / rect.width;
+  audioPlayer.currentTime = pct * audioPlayer.duration;
 }
-document.getElementById('since').textContent=
-  'Desde el '+ANN.toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'})+' 💖';
-setInterval(tick,1000); tick();
 
-// ══════════════════════════════════════════════
-// PARTÍCULAS
-// ══════════════════════════════════════════════
-const cv=document.getElementById('bg'), cx=cv.getContext('2d');
-function rsz(){ cv.width=innerWidth; cv.height=innerHeight; }
-window.addEventListener('resize',rsz); rsz();
-let pts=[];
-(function loop(){
-  cx.clearRect(0,0,cv.width,cv.height);
-  if(pts.length<14&&Math.random()<.065)
-    pts.push({x:Math.random()*cv.width,y:cv.height+6,sy:-(Math.random()*.42+.16),o:.52});
-  pts=pts.filter(p=>p.o>0);
-  pts.forEach(p=>{ p.y+=p.sy; p.o-=.001;
-    cx.fillStyle=`rgba(232,160,180,${p.o})`;
-    cx.beginPath(); cx.arc(p.x,p.y,2,0,Math.PI*2); cx.fill();
-  });
-  requestAnimationFrame(loop);
+/* ════════════════════════════════════════════════════════
+   CONTADOR — años / meses / días / horas
+════════════════════════════════════════════════════════ */
+function calcTimeDiff(from, to) {
+  let years  = to.getFullYear()  - from.getFullYear();
+  let months = to.getMonth()     - from.getMonth();
+  let days   = to.getDate()      - from.getDate();
+  const hours = to.getHours()   - from.getHours();
+
+  if (days < 0) {
+    months--;
+    const prevMonth = new Date(to.getFullYear(), to.getMonth(), 0);
+    days += prevMonth.getDate();
+  }
+  if (months < 0) { years--; months += 12; }
+
+  return { years, months, days, hours: ((hours % 24) + 24) % 24 };
+}
+
+function updateCounter() {
+  const now  = new Date();
+  const diff = calcTimeDiff(START_DATE, now);
+  document.getElementById('c-years').textContent  = diff.years;
+  document.getElementById('c-months').textContent = diff.months;
+  document.getElementById('c-days').textContent   = diff.days;
+  document.getElementById('c-hours').textContent  = diff.hours;
+}
+
+// Fecha de inicio formateada
+document.getElementById('c-since').textContent =
+  'Desde el ' + START_DATE.toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' }) + ' 💖';
+
+// Actualizar cada minuto (no necesitamos precisión de segundos)
+updateCounter();
+setInterval(updateCounter, 60_000);
+
+/* ════════════════════════════════════════════════════════
+   PARTÍCULAS — ultra ligeras, sin lag
+   Máx. 12 puntos simultáneos, sin rotación ni cálculos pesados
+════════════════════════════════════════════════════════ */
+(function initParticles() {
+  const canvas = document.getElementById('bg-canvas');
+  const ctx    = canvas.getContext('2d');
+  let   pts    = [];
+  let   lastSpawn = 0;
+
+  function resize() {
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resize, { passive: true });
+  resize();
+
+  function spawnParticle() {
+    pts.push({
+      x:  Math.random() * canvas.width,
+      y:  canvas.height + 5,
+      vy: -(Math.random() * 0.38 + 0.14),
+      o:  0.5 + Math.random() * 0.15,
+      r:  1.4 + Math.random() * 1.2,
+    });
+  }
+
+  let raf;
+  function loop(ts) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Spawn controlado — cada ~700ms, máx 12 partículas
+    if (pts.length < 12 && ts - lastSpawn > 700) {
+      spawnParticle();
+      lastSpawn = ts;
+    }
+
+    ctx.fillStyle = 'rgba(232,155,178,1)'; // color fijo, sólo cambia alpha
+    pts = pts.filter(p => p.o > 0.01);
+
+    for (const p of pts) {
+      p.y -= p.vy;  // sube
+      p.o -= 0.0008;
+      ctx.globalAlpha = p.o;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    ctx.globalAlpha = 1;
+    raf = requestAnimationFrame(loop);
+  }
+
+  raf = requestAnimationFrame(loop);
 })();
 
-// INIT
-build();
+/* ════════════════════════════════════════════════════════
+   UTILIDADES UI
+════════════════════════════════════════════════════════ */
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2600);
+}
+
+function spawnHearts() {
+  const emojis = ['💖', '💗', '💕', '🌹', '✨'];
+  emojis.forEach((e, i) => {
+    setTimeout(() => {
+      const el = document.createElement('div');
+      el.className   = 'floating-heart';
+      el.textContent = e;
+      el.style.left  = (18 + Math.random() * 64) + 'vw';
+      el.style.bottom = '18vh';
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 2300);
+    }, i * 110);
+  });
+}
+
+/* ════════════════════════════════════════════════════════
+   INIT
+════════════════════════════════════════════════════════ */
+buildBook();
 </script>
 </body>
 </html>
