@@ -6,1047 +6,682 @@
   <title>Para Ti 💖</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
   <style>
-    /* ════════════════════════════════════════
-       VARIABLES & RESET
-    ════════════════════════════════════════ */
     :root {
-      --rose:    #c2678a;
-      --rose-lt: #e8839f;
-      --gold:    #d4a76a;
-      --ink:     #3a2a35;
-      --parch:   #fef9f2;
-      --glass:   rgba(255,255,255,0.60);
-      --sh:      rgba(60,20,40,0.14);
+      --rose:  #c2678a;
+      --roselt:#e8839f;
+      --gold:  #d4a76a;
+      --ink:   #3a2a35;
+      --parch: #fef9f2;
+      --glass: rgba(255,255,255,0.60);
+      --sh:    rgba(60,20,40,0.14);
     }
-    *, *::before, *::after {
-      margin: 0; padding: 0;
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
     html, body {
-      height: 100%; overflow: hidden;
-      font-family: 'Cormorant Garamond', serif;
+      height:100%; overflow:hidden;
+      font-family:'Cormorant Garamond',serif;
       background:
         radial-gradient(ellipse at 30% 10%, #fce4ec 0%, #f8bbd0 40%, #f48fb1 75%, transparent 100%),
-        linear-gradient(150deg, #fce4ec 0%, #f8bbd0 100%);
+        linear-gradient(150deg,#fce4ec,#f8bbd0);
     }
 
-    /* ════════════════════════════════════════
-       CANVAS DE PARTÍCULAS (fondo)
-    ════════════════════════════════════════ */
-    #bg-canvas {
-      position: fixed; inset: 0;
-      pointer-events: none; z-index: 0;
-    }
+    #bg-canvas { position:fixed; inset:0; pointer-events:none; z-index:0; }
 
-    /* ════════════════════════════════════════
-       LAYOUT PRINCIPAL
-    ════════════════════════════════════════ */
+    /* ── LAYOUT ── */
     .app {
-      position: relative; z-index: 10;
-      width: 100%; height: 100%;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      padding: clamp(10px, 2vh, 20px) clamp(12px, 3vw, 20px);
-      gap: clamp(8px, 1.8vh, 14px);
+      position:relative; z-index:10;
+      width:100%; height:100%;
+      display:flex; flex-direction:column;
+      align-items:center; justify-content:center;
+      padding:clamp(8px,2vh,18px) clamp(10px,3vw,18px);
+      gap:clamp(7px,1.6vh,13px);
     }
 
-    /* ════════════════════════════════════════
-       CONTADOR
-    ════════════════════════════════════════ */
+    /* ── CONTADOR ── */
     .counter {
-      width: min(460px, 100%);
-      background: var(--glass); backdrop-filter: blur(16px);
-      border: 1px solid rgba(232,160,180,0.38);
-      border-radius: 40px;
-      padding: clamp(7px,1.5vh,11px) clamp(16px,4vw,28px);
-      text-align: center;
-      box-shadow: 0 4px 18px var(--sh);
+      width:min(460px,100%);
+      background:var(--glass); backdrop-filter:blur(16px);
+      border:1px solid rgba(232,160,180,0.38); border-radius:40px;
+      padding:clamp(7px,1.5vh,11px) clamp(14px,4vw,26px);
+      text-align:center; box-shadow:0 4px 18px var(--sh);
     }
     .counter-main {
-      font-size: clamp(0.72rem, 2.3vw, 0.9rem);
-      color: var(--ink);
-      display: flex; align-items: center; justify-content: center;
-      flex-wrap: wrap; gap: 4px 10px;
+      display:flex; align-items:center; justify-content:center;
+      flex-wrap:wrap; gap:4px 10px;
     }
-    .counter-unit { display: flex; flex-direction: column; align-items: center; }
-    .counter-val {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(1rem, 3.5vw, 1.4rem);
-      color: var(--rose); font-weight: 700; line-height: 1;
-    }
-    .counter-lbl {
-      font-size: clamp(0.55rem, 1.6vw, 0.65rem);
-      color: var(--ink); opacity: 0.5;
-      text-transform: uppercase; letter-spacing: 0.1em;
-    }
-    .counter-sep { color: rgba(194,103,138,0.35); font-size: 0.9rem; align-self: flex-start; margin-top: 2px; }
-    .counter-since {
-      margin-top: 4px;
-      font-size: clamp(0.58rem, 1.7vw, 0.7rem);
-      color: var(--rose); opacity: 0.7;
-      font-style: italic;
-    }
+    .counter-unit { display:flex; flex-direction:column; align-items:center; }
+    .counter-val  { font-family:'Playfair Display',serif; font-size:clamp(1rem,3.8vw,1.45rem); color:var(--rose); font-weight:700; line-height:1; }
+    .counter-lbl  { font-size:clamp(0.52rem,1.5vw,0.62rem); color:var(--ink); opacity:0.48; text-transform:uppercase; letter-spacing:0.1em; }
+    .counter-sep  { color:rgba(194,103,138,0.32); font-size:0.88rem; align-self:flex-start; margin-top:3px; }
+    .counter-since{ margin-top:4px; font-size:clamp(0.56rem,1.6vw,0.68rem); color:var(--rose); opacity:0.68; font-style:italic; }
 
-    /* ════════════════════════════════════════
-       LIBRO
-    ════════════════════════════════════════ */
+    /* ── LIBRO ── */
     .book-scene {
-      width: min(460px, 100%);
-      height: clamp(250px, 44vh, 410px);
-      perspective: 1800px;
-      flex-shrink: 0;
+      width:min(460px,100%);
+      height:clamp(240px,43vh,400px);
+      perspective:1800px; flex-shrink:0;
     }
-    .book {
-      width: 100%; height: 100%;
-      position: relative; transform-style: preserve-3d;
-    }
+    .book { width:100%; height:100%; position:relative; transform-style:preserve-3d; }
 
-    /* Lomo */
     .spine {
-      position: absolute; left: 0; top: 0;
-      width: 26px; height: 100%;
-      background: linear-gradient(180deg, var(--rose) 0%, #9e4b6a 50%, var(--rose) 100%);
-      border-radius: 6px 0 0 6px; z-index: 200;
-      box-shadow: -2px 0 8px rgba(60,20,40,0.22);
+      position:absolute; left:0; top:0; width:26px; height:100%;
+      background:linear-gradient(180deg,var(--rose) 0%,#9e4b6a 50%,var(--rose) 100%);
+      border-radius:6px 0 0 6px; z-index:200;
+      box-shadow:-2px 0 8px rgba(60,20,40,0.22);
     }
-    .spine-dot {
-      position: absolute; left: 50%; transform: translateX(-50%);
-      width: 4px; height: 4px; border-radius: 50%;
-      background: rgba(255,255,255,0.38);
-    }
+    .spine-dot { position:absolute; left:50%; transform:translateX(-50%); width:4px; height:4px; border-radius:50%; background:rgba(255,255,255,0.38); }
 
-    /* Páginas */
     .page {
-      position: absolute; top: 4px; left: 26px;
-      width: calc(100% - 30px); height: calc(100% - 8px);
-      background: var(--parch); border-radius: 0 10px 10px 0;
-      transform-origin: left center;
-      transition: transform 0.82s cubic-bezier(0.645, 0.045, 0.355, 1);
-      transform-style: preserve-3d; backface-visibility: hidden;
-      box-shadow: inset 2px 0 8px rgba(0,0,0,0.04), 2px 2px 7px rgba(0,0,0,0.1);
+      position:absolute; top:4px; left:26px;
+      width:calc(100% - 30px); height:calc(100% - 8px);
+      background:var(--parch); border-radius:0 10px 10px 0;
+      transform-origin:left center;
+      transition:transform 0.82s cubic-bezier(0.645,0.045,0.355,1);
+      transform-style:preserve-3d; backface-visibility:hidden;
+      box-shadow:inset 2px 0 8px rgba(0,0,0,0.04), 2px 2px 7px rgba(0,0,0,0.1);
     }
-    /* Líneas sutiles de página */
     .page::after {
-      content: ''; position: absolute; inset: 0;
-      border-radius: 0 10px 10px 0; pointer-events: none;
-      background: repeating-linear-gradient(
-        transparent, transparent 30px,
-        rgba(232,160,180,0.07) 30px, rgba(232,160,180,0.07) 31px
-      );
+      content:''; position:absolute; inset:0; border-radius:0 10px 10px 0; pointer-events:none;
+      background:repeating-linear-gradient(transparent,transparent 30px,rgba(232,160,180,0.07) 30px,rgba(232,160,180,0.07) 31px);
     }
-    /* Esquina doblada */
     .page:not(.cover)::before {
-      content: ''; position: absolute; bottom: 0; right: 0; z-index: 3;
-      border-style: solid; border-width: 0 0 18px 18px;
-      border-color: transparent transparent rgba(232,160,180,0.2) transparent;
-      transition: border-width 0.28s ease;
+      content:''; position:absolute; bottom:0; right:0; z-index:3;
+      border-style:solid; border-width:0 0 18px 18px;
+      border-color:transparent transparent rgba(232,160,180,0.2) transparent;
+      transition:border-width 0.28s;
     }
-    .page:not(.cover):hover::before {
-      border-width: 0 0 32px 32px;
-      border-color: transparent transparent rgba(232,160,180,0.38) transparent;
-    }
-    .page.flipped { transform: rotateY(-180deg); }
+    .page:not(.cover):hover::before { border-width:0 0 30px 30px; border-color:transparent transparent rgba(232,160,180,0.36) transparent; }
+    .page.flipped { transform:rotateY(-180deg); }
 
-    /* Cara frontal y trasera */
     .p-front, .p-back {
-      position: absolute; inset: 0;
-      padding: clamp(14px,3.5vw,28px) clamp(14px,3.5vw,26px);
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      text-align: center; backface-visibility: hidden;
-      border-radius: 0 10px 10px 0;
+      position:absolute; inset:0;
+      padding:clamp(12px,3vw,26px) clamp(12px,3vw,24px);
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      text-align:center; backface-visibility:hidden; border-radius:0 10px 10px 0;
     }
-    .p-back { transform: rotateY(180deg); background: #fdf5f8; }
+    .p-back { transform:rotateY(180deg); background:#fdf5f8; }
 
-    /* Tipografía de página */
-    .p-ornament {
-      width: 44px; height: 1px;
-      background: linear-gradient(90deg, transparent, var(--gold), transparent);
-      margin: 8px auto;
-    }
-    .p-quote {
-      font-size: clamp(0.84rem, 2.8vw, 1.12rem);
-      font-style: italic; color: var(--ink);
-      line-height: 1.55; margin: 6px 0;
-    }
-    .p-source {
-      font-size: clamp(0.56rem, 1.7vw, 0.7rem);
-      color: var(--rose); letter-spacing: 2px;
-      text-transform: uppercase; font-weight: 700;
-    }
-    .p-num {
-      position: absolute; bottom: 9px;
-      font-size: 0.58rem; color: rgba(60,20,40,0.26); font-style: italic;
-    }
-    .p-num.r { right: 13px; } .p-num.l { left: 13px; }
-    .p-author { font-size: 0.6rem; color: var(--rose); opacity: 0.62; margin-top: 5px; font-style: italic; }
-    .p-date   { font-size: 0.56rem; color: rgba(60,20,40,0.3); margin-top: 3px; }
-    .p-badge  {
-      font-size: 0.56rem; letter-spacing: 0.12em; text-transform: uppercase;
-      background: var(--rose); color: white; padding: 2px 9px;
-      border-radius: 20px; margin-bottom: 7px; display: inline-block;
-    }
-    .p-del {
-      position: absolute; top: 8px; right: 9px;
-      background: rgba(255,255,255,0.85);
-      border: 1.5px solid rgba(194,103,138,0.28);
-      border-radius: 50%; width: 27px; height: 27px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1rem; line-height: 1; cursor: pointer; color: var(--rose); z-index: 5;
-      transition: background 0.2s;
-    }
-    .p-del:active { background: #fee; }
+    .p-ornament { width:44px; height:1px; background:linear-gradient(90deg,transparent,var(--gold),transparent); margin:8px auto; }
+    .p-quote    { font-size:clamp(0.82rem,2.7vw,1.1rem); font-style:italic; color:var(--ink); line-height:1.55; margin:5px 0; }
+    .p-source   { font-size:clamp(0.54rem,1.6vw,0.68rem); color:var(--rose); letter-spacing:2px; text-transform:uppercase; font-weight:700; }
+    .p-num      { position:absolute; bottom:9px; font-size:0.56rem; color:rgba(60,20,40,0.25); font-style:italic; }
+    .p-num.r    { right:13px; } .p-num.l { left:13px; }
+    .p-author   { font-size:0.58rem; color:var(--rose); opacity:0.6; margin-top:4px; font-style:italic; }
+    .p-date     { font-size:0.54rem; color:rgba(60,20,40,0.3); margin-top:3px; }
+    .p-badge    { font-size:0.54rem; letter-spacing:0.12em; text-transform:uppercase; background:var(--rose); color:white; padding:2px 9px; border-radius:20px; margin-bottom:6px; display:inline-block; }
+    .p-del      { position:absolute; top:8px; right:9px; background:rgba(255,255,255,0.85); border:1.5px solid rgba(194,103,138,0.28); border-radius:50%; width:27px; height:27px; display:flex; align-items:center; justify-content:center; font-size:1rem; line-height:1; cursor:pointer; color:var(--rose); z-index:5; }
+    .p-del:active { background:#fee; }
 
-    /* Portada */
-    .cover {
-      background: linear-gradient(135deg, #f4b8cf, #e8839f 45%, #c2678a) !important;
-      z-index: 150; cursor: pointer; border-radius: 0 12px 12px 0;
-    }
-    .cover .p-front { background: transparent; }
-    .cover-border {
-      position: absolute; inset: 12px;
-      border: 1.5px solid rgba(255,255,255,0.3);
-      border-radius: 0 8px 8px 0;
-    }
+    .cover { background:linear-gradient(135deg,#f4b8cf,#e8839f 45%,#c2678a) !important; z-index:150; cursor:pointer; border-radius:0 12px 12px 0; }
+    .cover .p-front { background:transparent; }
+    .cover-border { position:absolute; inset:12px; border:1.5px solid rgba(255,255,255,0.3); border-radius:0 8px 8px 0; }
 
-    /* ════════════════════════════════════════
-       NAVEGACIÓN DE PÁGINAS
-    ════════════════════════════════════════ */
-    .book-nav {
-      display: flex; align-items: center; gap: 14px;
+    /* ── NAV ── */
+    .book-nav { display:flex; align-items:center; gap:14px; }
+    .nav-btn  {
+      width:clamp(36px,9vw,42px); height:clamp(36px,9vw,42px); border-radius:50%;
+      border:2px solid rgba(194,103,138,0.32); background:var(--glass); backdrop-filter:blur(8px);
+      color:var(--rose); font-size:1.05rem; cursor:pointer;
+      display:flex; align-items:center; justify-content:center;
+      box-shadow:0 3px 10px var(--sh); transition:background 0.18s,color 0.18s,transform 0.15s;
+      touch-action:manipulation;
     }
-    .nav-btn {
-      width: clamp(36px,9vw,42px); height: clamp(36px,9vw,42px);
-      border-radius: 50%;
-      border: 2px solid rgba(194,103,138,0.32);
-      background: var(--glass); backdrop-filter: blur(8px);
-      color: var(--rose); font-size: 1.05rem; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 3px 10px var(--sh);
-      transition: background 0.18s, color 0.18s, transform 0.15s;
-      touch-action: manipulation;
-    }
-    .nav-btn:active  { background: var(--rose); color: white; transform: scale(0.9); }
-    .nav-btn:disabled { opacity: 0.2; cursor: default; pointer-events: none; }
-    .nav-indicator {
-      font-family: 'Playfair Display', serif;
-      font-size: 0.8rem; color: var(--ink); opacity: 0.48;
-      min-width: 54px; text-align: center;
-    }
+    .nav-btn:active   { background:var(--rose); color:white; transform:scale(0.9); }
+    .nav-btn:disabled { opacity:0.2; cursor:default; pointer-events:none; }
+    .nav-indicator    { font-family:'Playfair Display',serif; font-size:0.8rem; color:var(--ink); opacity:0.46; min-width:54px; text-align:center; }
 
-    /* ════════════════════════════════════════
-       BARRA DE MÚSICA
-    ════════════════════════════════════════ */
+    /* ── MÚSICA ── */
     .music-bar {
-      width: min(460px, 100%);
-      background: var(--glass); backdrop-filter: blur(14px);
-      border: 1.5px solid rgba(194,103,138,0.28);
-      border-radius: 16px;
-      padding: clamp(9px,2vw,13px) clamp(12px,3vw,18px);
-      display: flex; align-items: center; gap: 12px;
-      box-shadow: 0 3px 14px var(--sh);
+      width:min(460px,100%);
+      background:var(--glass); backdrop-filter:blur(14px);
+      border:1.5px solid rgba(194,103,138,0.28); border-radius:16px;
+      padding:clamp(8px,2vw,12px) clamp(11px,3vw,17px);
+      display:flex; align-items:center; gap:12px;
+      box-shadow:0 3px 14px var(--sh);
     }
-    .music-info { flex: 1; min-width: 0; }
-    .music-title {
-      font-size: clamp(0.66rem,2vw,0.8rem);
-      color: var(--rose); font-weight: 700;
-      letter-spacing: 0.06em; text-transform: uppercase;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
-    .music-sub {
-      font-size: clamp(0.56rem,1.6vw,0.66rem);
-      color: var(--ink); opacity: 0.48;
-      margin-top: 2px; font-style: italic;
-    }
-    .music-controls { display: flex; gap: 7px; flex-shrink: 0; }
+    .music-info  { flex:1; min-width:0; }
+    .music-title { font-size:clamp(0.64rem,2vw,0.78rem); color:var(--rose); font-weight:700; letter-spacing:0.06em; text-transform:uppercase; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .music-sub   { font-size:clamp(0.54rem,1.5vw,0.64rem); color:var(--ink); opacity:0.46; margin-top:2px; font-style:italic; }
+    .music-progress { width:100%; height:3px; border-radius:2px; background:rgba(194,103,138,0.18); margin-top:7px; cursor:pointer; overflow:hidden; }
+    .music-fill     { height:100%; border-radius:2px; background:linear-gradient(90deg,var(--roselt),var(--rose)); width:0%; transition:width 0.4s linear; }
+    .music-controls { display:flex; gap:7px; flex-shrink:0; }
     .music-btn {
-      width: 33px; height: 33px; border-radius: 50%;
-      border: 1.5px solid rgba(194,103,138,0.32);
-      background: rgba(255,255,255,0.82);
-      color: var(--rose); font-size: 0.95rem; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      transition: background 0.18s, color 0.18s, transform 0.15s;
-      touch-action: manipulation;
+      width:33px; height:33px; border-radius:50%;
+      border:1.5px solid rgba(194,103,138,0.3); background:rgba(255,255,255,0.82);
+      color:var(--rose); font-size:0.95rem; cursor:pointer;
+      display:flex; align-items:center; justify-content:center;
+      transition:background 0.18s,color 0.18s,transform 0.15s;
+      touch-action:manipulation;
     }
-    .music-btn:active { background: var(--rose); color: white; transform: scale(0.9); }
+    .music-btn:active { background:var(--rose); color:white; transform:scale(0.9); }
 
-    /* Barra de progreso */
-    .music-progress {
-      width: 100%;
-      height: 3px; border-radius: 2px;
-      background: rgba(194,103,138,0.18);
-      margin-top: 8px; cursor: pointer; overflow: hidden;
-    }
-    .music-progress-fill {
-      height: 100%; border-radius: 2px;
-      background: linear-gradient(90deg, var(--rose-lt), var(--rose));
-      width: 0%; transition: width 0.4s linear;
-    }
-
-    /* ════════════════════════════════════════
-       BOTÓN AGREGAR FRASE
-    ════════════════════════════════════════ */
+    /* ── BTN AGREGAR ── */
     .btn-add {
-      position: fixed;
-      bottom: clamp(14px,3vh,24px);
-      left:   clamp(14px,3vw,24px);
-      z-index: 500;
-      width: 44px; height: 44px; border-radius: 50%;
-      background: rgba(255,255,255,0.9); backdrop-filter: blur(10px);
-      border: 2px solid var(--rose); color: var(--rose);
-      font-size: 1.55rem; font-weight: 300; line-height: 1;
-      cursor: pointer;
-      display: none; align-items: center; justify-content: center;
-      box-shadow: 0 4px 16px var(--sh);
-      transition: background 0.2s, color 0.2s, transform 0.15s;
-      touch-action: manipulation;
+      position:fixed; bottom:clamp(14px,3vh,22px); left:clamp(14px,3vw,22px); z-index:500;
+      width:44px; height:44px; border-radius:50%;
+      background:rgba(255,255,255,0.9); backdrop-filter:blur(10px);
+      border:2px solid var(--rose); color:var(--rose);
+      font-size:1.55rem; font-weight:300; line-height:1;
+      cursor:pointer; display:none; align-items:center; justify-content:center;
+      box-shadow:0 4px 16px var(--sh); touch-action:manipulation;
     }
-    .btn-add:active { background: var(--rose); color: white; transform: scale(0.9); }
+    .btn-add:active { background:var(--rose); color:white; transform:scale(0.9); }
 
-    /* ════════════════════════════════════════
-       MODALES
-    ════════════════════════════════════════ */
-    .overlay {
-      position: fixed; inset: 0;
-      background: rgba(58,42,53,0.46); backdrop-filter: blur(7px);
-      z-index: 1000;
-      display: none; align-items: center; justify-content: center;
-      padding: 16px;
+    /* ── MODALES ── */
+    .overlay { position:fixed; inset:0; background:rgba(58,42,53,0.46); backdrop-filter:blur(7px); z-index:1000; display:none; align-items:center; justify-content:center; padding:16px; }
+    .overlay.on { display:flex; }
+    .mbox {
+      background:var(--parch); border-radius:22px;
+      padding:clamp(18px,5vw,30px) clamp(16px,5vw,26px);
+      width:min(420px,100%); max-height:92vh; overflow-y:auto;
+      box-shadow:0 20px 60px rgba(58,42,53,0.28);
+      animation:slideUp 0.3s cubic-bezier(0.34,1.56,0.64,1) both;
     }
-    .overlay.visible { display: flex; }
+    @keyframes slideUp { from{opacity:0;transform:scale(0.88) translateY(14px)} to{opacity:1;transform:none} }
+    .mbox h3   { font-family:'Playfair Display',serif; font-size:1.25rem; color:var(--rose); text-align:center; margin-bottom:4px; }
+    .mbox .sub { font-size:0.74rem; color:rgba(58,42,53,0.46); text-align:center; margin-bottom:16px; font-style:italic; }
+    .mbox label{ font-size:0.7rem; color:var(--rose); letter-spacing:0.09em; text-transform:uppercase; display:block; margin:11px 0 4px; }
+    .mbox input,.mbox textarea { width:100%; padding:9px 13px; border-radius:11px; border:1.5px solid rgba(232,160,180,0.44); background:white; font-family:'Cormorant Garamond',serif; font-size:1rem; color:var(--ink); resize:none; outline:none; -webkit-appearance:none; transition:border-color 0.2s; }
+    .mbox input:focus,.mbox textarea:focus { border-color:var(--rose); }
+    .m-actions { display:flex; gap:10px; margin-top:16px; }
+    .btn-save   { flex:1; padding:10px; border-radius:30px; border:none; background:var(--rose); color:white; font-family:'Playfair Display',serif; font-size:0.92rem; cursor:pointer; }
+    .btn-cancel { padding:10px 15px; border-radius:30px; border:2px solid rgba(194,103,138,0.34); background:transparent; color:var(--rose); font-size:0.86rem; cursor:pointer; }
 
-    .modal-box {
-      background: var(--parch); border-radius: 22px;
-      padding: clamp(20px,5vw,32px) clamp(18px,5vw,28px);
-      width: min(420px, 100%); max-height: 92vh; overflow-y: auto;
-      box-shadow: 0 20px 60px rgba(58,42,53,0.28);
-      animation: slideUp 0.32s cubic-bezier(0.34,1.56,0.64,1) both;
-    }
-    @keyframes slideUp {
-      from { opacity: 0; transform: scale(0.88) translateY(16px); }
-      to   { opacity: 1; transform: none; }
-    }
-    .modal-box h3 {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.3rem; color: var(--rose);
-      text-align: center; margin-bottom: 4px;
-    }
-    .modal-box .modal-sub {
-      font-size: 0.76rem; color: rgba(58,42,53,0.48);
-      text-align: center; margin-bottom: 18px; font-style: italic;
-    }
-    .modal-box label {
-      font-size: 0.72rem; color: var(--rose);
-      letter-spacing: 0.09em; text-transform: uppercase;
-      display: block; margin: 12px 0 4px;
-    }
-    .modal-box input,
-    .modal-box textarea {
-      width: 100%; padding: 10px 14px; border-radius: 11px;
-      border: 1.5px solid rgba(232,160,180,0.46); background: white;
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1rem; color: var(--ink);
-      resize: none; outline: none;
-      transition: border-color 0.2s;
-      -webkit-appearance: none;
-    }
-    .modal-box input:focus,
-    .modal-box textarea:focus { border-color: var(--rose); }
-    .modal-actions { display: flex; gap: 10px; margin-top: 18px; }
-    .btn-save {
-      flex: 1; padding: 11px; border-radius: 30px; border: none;
-      background: var(--rose); color: white;
-      font-family: 'Playfair Display', serif;
-      font-size: 0.95rem; cursor: pointer;
-      transition: background 0.2s, transform 0.15s;
-    }
-    .btn-save:active { transform: scale(0.97); }
-    .btn-cancel {
-      padding: 11px 17px; border-radius: 30px;
-      border: 2px solid rgba(194,103,138,0.36); background: transparent;
-      color: var(--rose); font-size: 0.88rem; cursor: pointer;
-    }
+    .cbox { background:var(--parch); border-radius:22px; padding:26px 22px; width:min(310px,100%); text-align:center; box-shadow:0 20px 60px rgba(58,42,53,0.28); animation:slideUp 0.28s cubic-bezier(0.34,1.56,0.64,1) both; }
+    .cbox h3 { font-family:'Playfair Display',serif; color:var(--rose); font-size:1.12rem; margin-bottom:8px; }
+    .cbox p  { font-size:0.8rem; color:rgba(58,42,53,0.56); font-style:italic; margin-bottom:18px; line-height:1.5; }
+    .c-actions { display:flex; gap:10px; justify-content:center; }
+    .btn-cyes { padding:9px 20px; border-radius:30px; border:none; background:var(--rose); color:white; font-size:0.9rem; cursor:pointer; }
+    .btn-cno  { padding:9px 16px; border-radius:30px; border:2px solid rgba(194,103,138,0.34); background:transparent; color:var(--rose); font-size:0.86rem; cursor:pointer; }
 
-    /* Modal confirmar eliminar */
-    .confirm-box {
-      background: var(--parch); border-radius: 22px;
-      padding: 28px 24px; width: min(320px,100%);
-      text-align: center;
-      box-shadow: 0 20px 60px rgba(58,42,53,0.28);
-      animation: slideUp 0.28s cubic-bezier(0.34,1.56,0.64,1) both;
-    }
-    .confirm-box h3 { font-family: 'Playfair Display', serif; color: var(--rose); font-size: 1.15rem; margin-bottom: 8px; }
-    .confirm-box p  { font-size: 0.82rem; color: rgba(58,42,53,0.58); font-style: italic; margin-bottom: 20px; line-height: 1.5; }
-    .confirm-actions { display: flex; gap: 10px; justify-content: center; }
-    .btn-confirm-yes { padding: 10px 22px; border-radius: 30px; border: none; background: var(--rose); color: white; font-size: 0.92rem; cursor: pointer; }
-    .btn-confirm-no  { padding: 10px 18px; border-radius: 30px; border: 2px solid rgba(194,103,138,0.36); background: transparent; color: var(--rose); font-size: 0.88rem; cursor: pointer; }
+    /* ── TOAST ── */
+    .toast { position:fixed; bottom:70px; left:50%; transform:translateX(-50%) translateY(10px); background:var(--rose); color:white; padding:9px 22px; border-radius:30px; font-size:0.8rem; z-index:2000; opacity:0; pointer-events:none; white-space:nowrap; transition:opacity 0.3s,transform 0.3s; }
+    .toast.on { opacity:1; transform:translateX(-50%) translateY(0); }
 
-    /* ════════════════════════════════════════
-       TOAST
-    ════════════════════════════════════════ */
-    .toast {
-      position: fixed; bottom: 72px; left: 50%;
-      transform: translateX(-50%) translateY(12px);
-      background: var(--rose); color: white;
-      padding: 9px 22px; border-radius: 30px;
-      font-size: 0.82rem; z-index: 2000;
-      opacity: 0; pointer-events: none; white-space: nowrap;
-      transition: opacity 0.32s ease, transform 0.32s ease;
-    }
-    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-    /* ════════════════════════════════════════
-       CORAZONES FLOTANTES
-    ════════════════════════════════════════ */
-    .floating-heart {
-      position: fixed; pointer-events: none; z-index: 999;
-      font-size: 1.3rem;
-      animation: floatUp 2.2s ease-out forwards;
-    }
-    @keyframes floatUp {
-      0%   { transform: translateY(0) scale(1); opacity: 1; }
-      100% { transform: translateY(-55vh) scale(0.3); opacity: 0; }
-    }
-
-    /* ════════════════════════════════════════
-       ANIMACIONES DE PORTADA
-    ════════════════════════════════════════ */
-    @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.1); } }
-    @keyframes blink { 0%,100% { opacity: 0.5; } 50% { opacity: 1; } }
+    .fheart { position:fixed; pointer-events:none; z-index:999; font-size:1.3rem; animation:fup 2.2s ease-out forwards; }
+    @keyframes fup   { 0%{transform:translateY(0) scale(1);opacity:1} 100%{transform:translateY(-55vh) scale(0.3);opacity:0} }
+    @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
+    @keyframes blink { 0%,100%{opacity:0.5} 50%{opacity:1} }
   </style>
 </head>
 <body>
 
-  <!-- Partículas de fondo -->
-  <canvas id="bg-canvas"></canvas>
+<canvas id="bg-canvas"></canvas>
 
-  <!-- Layout principal -->
-  <div class="app">
+<div class="app">
 
-    <!-- ── CONTADOR ── -->
-    <div class="counter">
-      <div class="counter-main">
-        <div class="counter-unit">
-          <span class="counter-val" id="c-years">0</span>
-          <span class="counter-lbl">años</span>
-        </div>
-        <span class="counter-sep">·</span>
-        <div class="counter-unit">
-          <span class="counter-val" id="c-months">0</span>
-          <span class="counter-lbl">meses</span>
-        </div>
-        <span class="counter-sep">·</span>
-        <div class="counter-unit">
-          <span class="counter-val" id="c-days">0</span>
-          <span class="counter-lbl">días</span>
-        </div>
-        <span class="counter-sep">·</span>
-        <div class="counter-unit">
-          <span class="counter-val" id="c-hours">0</span>
-          <span class="counter-lbl">horas</span>
-        </div>
+  <!-- CONTADOR -->
+  <div class="counter">
+    <div class="counter-main">
+      <div class="counter-unit">
+        <span class="counter-val" id="c-y">0</span>
+        <span class="counter-lbl">años</span>
       </div>
-      <div class="counter-since" id="c-since"></div>
-    </div>
-
-    <!-- ── LIBRO ── -->
-    <div class="book-scene">
-      <div class="book">
-
-        <!-- Lomo -->
-        <div class="spine">
-          <div class="spine-dot" style="top:22%"></div>
-          <div class="spine-dot" style="top:50%"></div>
-          <div class="spine-dot" style="top:78%"></div>
-        </div>
-
-        <!-- Páginas (se generan con JS) -->
-        <div id="pages-root"></div>
-
-        <!-- Portada (siempre encima) -->
-        <div class="page cover" id="cover" onclick="openBook()" style="z-index:150">
-          <div class="cover-border"></div>
-          <div class="p-front">
-            <div style="font-size:clamp(1.5rem,5vw,2rem);margin-bottom:10px;animation:pulse 2.5s ease-in-out infinite">💖</div>
-            <h2 style="font-family:'Playfair Display';font-size:clamp(1.5rem,5vw,2rem);color:white;font-style:italic;text-shadow:0 2px 10px rgba(58,42,53,0.28);line-height:1.2">Para Ti</h2>
-            <p style="margin-top:9px;font-style:italic;color:rgba(255,255,255,0.84);font-size:clamp(0.78rem,2.4vw,0.94rem)">Nuestra historia en cada página</p>
-            <div style="margin-top:clamp(16px,3vh,26px);font-size:clamp(0.53rem,1.7vw,0.63rem);letter-spacing:3px;color:rgba(255,255,255,0.66);animation:blink 2.2s ease-in-out infinite">✦ TOCA PARA ABRIR ✦</div>
-          </div>
-        </div>
-
-      </div><!-- /book -->
-    </div><!-- /book-scene -->
-
-    <!-- ── NAVEGACIÓN ── -->
-    <div class="book-nav" id="book-nav" style="display:none">
-      <button class="nav-btn" id="btn-prev" onclick="prevPage()">←</button>
-      <div class="nav-indicator" id="nav-indicator">1 / 1</div>
-      <button class="nav-btn" id="btn-next" onclick="nextPage()">→</button>
-    </div>
-
-    <!-- ── MÚSICA ── -->
-    <div class="music-bar" id="music-bar" style="display:none">
-      <div class="music-info">
-        <div class="music-title" id="music-title">♩ The Reason</div>
-        <div class="music-sub">nuestra playlist</div>
-        <div class="music-progress" id="music-progress" onclick="seekMusic(event)">
-          <div class="music-progress-fill" id="music-progress-fill"></div>
-        </div>
+      <span class="counter-sep">·</span>
+      <div class="counter-unit">
+        <span class="counter-val" id="c-m">0</span>
+        <span class="counter-lbl">meses</span>
       </div>
-      <div class="music-controls">
-        <button class="music-btn" onclick="prevTrack()" title="Anterior">⟨</button>
-        <button class="music-btn" id="btn-play" onclick="togglePlay()">▷</button>
-        <button class="music-btn" onclick="nextTrack()" title="Siguiente">⟩</button>
+      <span class="counter-sep">·</span>
+      <div class="counter-unit">
+        <span class="counter-val" id="c-d">0</span>
+        <span class="counter-lbl">días</span>
+      </div>
+      <span class="counter-sep">·</span>
+      <div class="counter-unit">
+        <span class="counter-val" id="c-h">0</span>
+        <span class="counter-lbl">horas</span>
       </div>
     </div>
-
-  </div><!-- /app -->
-
-  <!-- YouTube iframe oculto fuera de pantalla (display:none bloquea el audio) -->
-  <div id="yt-container" style="position:fixed;bottom:-400px;left:0;width:1px;height:1px;opacity:0;pointer-events:none;">
-    <div id="yt-player"></div>
+    <div class="counter-since" id="c-since"></div>
   </div>
 
-  <!-- Botón agregar frase -->
-  <button class="btn-add" id="btn-add" onclick="openAddModal()" title="Escribir en el libro">+</button>
-
-  <!-- ── MODAL AGREGAR FRASE ── -->
-  <div class="overlay" id="overlay-add" onclick="handleOverlayClick(event,'overlay-add')">
-    <div class="modal-box">
-      <h3>✦ Escribir en el libro</h3>
-      <p class="modal-sub">Tu frase quedará guardada para siempre en estas páginas</p>
-      <label>Tu frase o mensaje *</label>
-      <textarea id="input-quote" rows="3" placeholder='"Lo que siento por ti no tiene nombre..."'></textarea>
-      <label>Tu nombre</label>
-      <input id="input-author" type="text" placeholder="Ej: Ana, Carlos...">
-      <label>Libro o fuente <span style="opacity:0.42;font-size:0.68rem">(opcional)</span></label>
-      <input id="input-book" type="text" placeholder="Ej: Nuestro diario, Mi corazón...">
-      <div class="modal-actions">
-        <button class="btn-cancel" onclick="closeAddModal()">Cancelar</button>
-        <button class="btn-save"   onclick="saveQuote()">Guardar 💖</button>
+  <!-- LIBRO -->
+  <div class="book-scene">
+    <div class="book">
+      <div class="spine">
+        <div class="spine-dot" style="top:22%"></div>
+        <div class="spine-dot" style="top:50%"></div>
+        <div class="spine-dot" style="top:78%"></div>
+      </div>
+      <div id="pages-root"></div>
+      <div class="page cover" id="cover" style="z-index:150" onclick="openBook()">
+        <div class="cover-border"></div>
+        <div class="p-front">
+          <div style="font-size:clamp(1.5rem,5vw,2rem);margin-bottom:10px;animation:pulse 2.5s ease-in-out infinite">💖</div>
+          <h2 style="font-family:'Playfair Display';font-size:clamp(1.4rem,5vw,1.95rem);color:white;font-style:italic;text-shadow:0 2px 10px rgba(58,42,53,0.28);line-height:1.2">Para Ti</h2>
+          <p style="margin-top:9px;font-style:italic;color:rgba(255,255,255,0.84);font-size:clamp(0.76rem,2.3vw,0.92rem)">Nuestra historia en cada página</p>
+          <div style="margin-top:clamp(14px,3vh,24px);font-size:clamp(0.52rem,1.6vw,0.62rem);letter-spacing:3px;color:rgba(255,255,255,0.65);animation:blink 2.2s ease-in-out infinite">✦ TOCA PARA ABRIR ✦</div>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- ── MODAL CONFIRMAR ELIMINAR ── -->
-  <div class="overlay" id="overlay-confirm" onclick="handleOverlayClick(event,'overlay-confirm')">
-    <div class="confirm-box">
-      <h3>¿Eliminar esta frase?</h3>
-      <p id="confirm-text"></p>
-      <div class="confirm-actions">
-        <button class="btn-confirm-no"  onclick="closeConfirmModal()">Cancelar</button>
-        <button class="btn-confirm-yes" onclick="confirmDelete()">Eliminar</button>
+  <!-- NAV -->
+  <div class="book-nav" id="book-nav" style="display:none">
+    <button class="nav-btn" id="btn-prev" onclick="prevPage()">←</button>
+    <div class="nav-indicator" id="nav-ind">1 / 1</div>
+    <button class="nav-btn" id="btn-next" onclick="nextPage()">→</button>
+  </div>
+
+  <!-- MÚSICA -->
+  <div class="music-bar" id="music-bar" style="display:none">
+    <div class="music-info">
+      <div class="music-title" id="music-title">♩ The Reason</div>
+      <div class="music-sub">nuestra playlist</div>
+      <div class="music-progress" onclick="seekMusic(event)">
+        <div class="music-fill" id="music-fill"></div>
       </div>
+    </div>
+    <div class="music-controls">
+      <button class="music-btn" onclick="prevTrack()">⟨</button>
+      <button class="music-btn" id="btn-play" onclick="togglePlay()">▷</button>
+      <button class="music-btn" onclick="nextTrack()">⟩</button>
     </div>
   </div>
 
-  <!-- Toast de notificaciones -->
-  <div class="toast" id="toast"></div>
+</div><!-- /app -->
+
+<!-- YouTube player oculto fuera de pantalla (NO display:none, bloquea audio) -->
+<div style="position:fixed;bottom:-500px;left:0;width:2px;height:2px;opacity:0;pointer-events:none">
+  <div id="yt-player"></div>
+</div>
+
+<!-- Botón agregar frase -->
+<button class="btn-add" id="btn-add" onclick="openAddModal()">+</button>
+
+<!-- Modal agregar frase -->
+<div class="overlay" id="ov-add" onclick="if(event.target===this)closeAddModal()">
+  <div class="mbox">
+    <h3>✦ Escribir en el libro</h3>
+    <p class="sub">Tu frase quedará guardada para siempre</p>
+    <label>Tu frase o mensaje *</label>
+    <textarea id="in-quote" rows="3" placeholder='"Lo que siento por ti..."'></textarea>
+    <label>Tu nombre</label>
+    <input id="in-author" type="text" placeholder="Tu nombre">
+    <label>Libro o fuente <span style="opacity:0.4;font-size:0.68rem">(opcional)</span></label>
+    <input id="in-book" type="text" placeholder="Nuestro diario...">
+    <div class="m-actions">
+      <button class="btn-cancel" onclick="closeAddModal()">Cancelar</button>
+      <button class="btn-save"   onclick="saveQuote()">Guardar 💖</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal confirmar eliminar -->
+<div class="overlay" id="ov-confirm" onclick="if(event.target===this)closeConfirm()">
+  <div class="cbox">
+    <h3>¿Eliminar esta frase?</h3>
+    <p id="confirm-text"></p>
+    <div class="c-actions">
+      <button class="btn-cno"  onclick="closeConfirm()">Cancelar</button>
+      <button class="btn-cyes" onclick="doDelete()">Eliminar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
 
 <script>
-'use strict';
+/* ══════════════════════════════════════════════════════════
+   CONFIGURACIÓN — edita solo esta sección
+══════════════════════════════════════════════════════════ */
+const START = new Date('2024-12-13T00:00:00');
 
-/* ════════════════════════════════════════════════════════
-   CONFIGURACIÓN
-════════════════════════════════════════════════════════ */
-
-/** Fecha de inicio de la relación */
-const START_DATE = new Date('2024-12-13T00:00:00');
-
-/**
- * PLAYLIST — Archive.org MP3 (sin anuncios, canciones completas)
- * Para agregar canciones: ve a archive.org, busca la canción,
- * copia el link del botón "VBR MP3 download" y agrégalo aquí.
- */
+// Para agregar canciones: YouTube → copiar ID (11 chars después de ?v=)
 const PLAYLIST = [
-  {
-    title: 'The Reason',
-    url:   'https://archive.org/download/EnglishSongs_43/Hoobastank%20-%20The%20Reason'
-  },
-  {
-    title: 'Wonderwall',
-    url:   'https://archive.org/download/mp-3-dl.-cc-wonderwall-320k/%5BMP3DL.CC%5D%20Wonderwall-320k.mp3'
-  },
+  { title:'The Reason', id:'fV4DiAyExN0' }, // Hoobastank
+  { title:'Wonderwall',  id:'bx1Bh8ZvH84' }, // Oasis
 ];
 
-/** Páginas fijas del libro */
-const FIXED_PAGES = [
-  { quote: 'No importa lo que pase mañana, te quiero hoy.',                                source: 'Nuestro Camino Eterno' },
-  { quote: '¿Me amas? ¿Real o no real? —Real.',                                            source: 'Los Juegos del Hambre' },
-  { quote: 'Eres lo único que me hace sentir seguro en este mundo.',                        source: 'Los Juegos del Hambre' },
-  { quote: 'Ella no me necesita. Y yo... yo no puedo vivir sin ella.',                      source: 'Los Juegos del Hambre' },
-  { quote: '—Buenas noches, Liam. —Buenas noches, supernova.',                             source: 'Hasta que nos quedemos sin estrellas' },
-  { quote: 'No quiero que me bajen la luna, quiero que alguien se siente a verla conmigo.', source: 'Hasta que nos quedemos sin estrellas' },
-  { quote: 'Aprendí que el hogar no es un lugar, es una persona. Y mi hogar eres tú.',     source: 'Hasta que nos quedemos sin estrellas' },
-  { quote: 'Rompe mi corazón si quieres, pero no te vayas. Nunca lo hagas.',               source: 'Boulevard' },
-  { quote: 'Ahora sé que la droga más fuerte de un ser humano es otro ser humano.',        source: 'Boulevard' },
-  { quote: 'Luke era el sol y yo la luna, y en un mundo perfecto, el eclipse sería eterno.', source: 'Boulevard' },
-  { quote: '—Sí, me gusta —sonreí—. Tú me gustas.',                                       source: 'Boulevard' },
-  { quote: 'Si el mundo se acaba hoy, me gustaría que me encontrara a tu lado.',           source: 'Boulevard' },
+const FIXED = [
+  { q:'No importa lo que pase mañana, te quiero hoy.',                                 s:'Nuestro Camino Eterno' },
+  { q:'¿Me amas? ¿Real o no real? —Real.',                                             s:'Los Juegos del Hambre' },
+  { q:'Eres lo único que me hace sentir seguro en este mundo.',                         s:'Los Juegos del Hambre' },
+  { q:'Ella no me necesita. Y yo... yo no puedo vivir sin ella.',                       s:'Los Juegos del Hambre' },
+  { q:'—Buenas noches, Liam. —Buenas noches, supernova.',                              s:'Hasta que nos quedemos sin estrellas' },
+  { q:'No quiero que me bajen la luna, quiero que alguien se siente a verla conmigo.', s:'Hasta que nos quedemos sin estrellas' },
+  { q:'Aprendí que el hogar no es un lugar, es una persona. Y mi hogar eres tú.',      s:'Hasta que nos quedemos sin estrellas' },
+  { q:'Rompe mi corazón si quieres, pero no te vayas. Nunca lo hagas.',                s:'Boulevard' },
+  { q:'Ahora sé que la droga más fuerte de un ser humano es otro ser humano.',         s:'Boulevard' },
+  { q:'Luke era el sol y yo la luna, y en un mundo perfecto, el eclipse sería eterno.',s:'Boulevard' },
+  { q:'—Sí, me gusta —sonreí—. Tú me gustas.',                                        s:'Boulevard' },
+  { q:'Si el mundo se acaba hoy, me gustaría que me encontrara a tu lado.',            s:'Boulevard' },
 ];
 
-/* ════════════════════════════════════════════════════════
-   ESTADO GLOBAL
-════════════════════════════════════════════════════════ */
-let pages        = [];   // Array de elementos DOM de páginas
-let currentPage  = -1;   // Índice de página activa (-1 = portada)
-let isOpen       = false; // Libro abierto
-let isFlipping   = false; // Animación en curso
-let trackIndex   = 0;    // Canción actual
-let pendingDelete = -1;   // Índice de frase a eliminar
+/* ══════════════════════════════════════════════════════════
+   ESTADO
+══════════════════════════════════════════════════════════ */
+let pages      = [];
+let curPage    = -1;
+let bookOpen   = false;
+let flipping   = false;
+let delPending = -1;
 
-/* ════════════════════════════════════════════════════════
-   CONSTRUCCIÓN DEL LIBRO
-════════════════════════════════════════════════════════ */
-function loadCustomQuotes() {
-  try { return JSON.parse(localStorage.getItem('amor_frases') || '[]'); }
-  catch { return []; }
+/* ══════════════════════════════════════════════════════════
+   LIBRO — construir páginas
+══════════════════════════════════════════════════════════ */
+function loadQ(){ try{ return JSON.parse(localStorage.getItem('amor_q')||'[]'); }catch{ return []; } }
+function saveQ(a){ localStorage.setItem('amor_q', JSON.stringify(a)); }
+
+function esc(s){
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-function saveCustomQuotes(arr) {
-  localStorage.setItem('amor_frases', JSON.stringify(arr));
-}
-
-function buildBook() {
-  const root   = document.getElementById('pages-root');
+function buildBook(){
+  const root = document.getElementById('pages-root');
   root.innerHTML = '';
   pages = [];
-
-  const custom = loadCustomQuotes();
-  const all    = [...FIXED_PAGES, ...custom];
+  const custom = loadQ();
+  const all    = [...FIXED, ...custom];
 
   all.forEach((item, i) => {
-    const isCustom = i >= FIXED_PAGES.length;
-    const dateStr  = isCustom && item.savedAt
-      ? new Date(item.savedAt).toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' })
+    const isC = i >= FIXED.length;
+    const ds  = isC && item.t
+      ? new Date(item.t).toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'})
       : '';
-
-    const page = document.createElement('div');
-    page.className = 'page';
-    page.style.zIndex = all.length - i;
-
-    page.innerHTML = `
+    const pg = document.createElement('div');
+    pg.className = 'page';
+    pg.style.zIndex = all.length - i;
+    pg.innerHTML = `
       <div class="p-front">
-        ${isCustom ? '<div class="p-badge">✦ Escrito por nosotros ✦</div>' : ''}
+        ${isC ? '<div class="p-badge">✦ Escrito por nosotros ✦</div>' : ''}
         <div class="p-ornament"></div>
-        <p class="p-quote">"${escapeHTML(item.quote)}"</p>
+        <p class="p-quote">"${esc(item.q)}"</p>
         <div class="p-ornament"></div>
-        <span class="p-source">${escapeHTML(item.source || item.book || '')}</span>
-        ${isCustom && item.author ? `<div class="p-author">— ${escapeHTML(item.author)}</div>` : ''}
-        ${isCustom && dateStr     ? `<div class="p-date">${dateStr}</div>` : ''}
-        ${isCustom ? `<button class="p-del" onclick="openDeleteModal(${i - FIXED_PAGES.length})">×</button>` : ''}
-        <div class="p-num r">Pág. ${(i + 1) * 2 - 1}</div>
+        <span class="p-source">${esc(item.s||'')}</span>
+        ${isC && item.a ? `<div class="p-author">— ${esc(item.a)}</div>` : ''}
+        ${isC && ds     ? `<div class="p-date">${ds}</div>` : ''}
+        ${isC ? `<button class="p-del" onclick="openDeleteModal(${i-FIXED.length})">×</button>` : ''}
+        <div class="p-num r">Pág. ${(i+1)*2-1}</div>
       </div>
       <div class="p-back">
         <div class="p-ornament"></div>
-        <div style="font-size:1.4rem;margin:6px 0">💖</div>
-        <div style="font-size:0.76rem;font-style:italic;color:rgba(58,42,53,0.36)">Con amor, siempre</div>
+        <div style="font-size:1.3rem;margin:5px 0">💖</div>
+        <div style="font-size:0.74rem;font-style:italic;color:rgba(58,42,53,0.35)">Con amor, siempre</div>
         <div class="p-ornament"></div>
-        <div class="p-num l">Pág. ${(i + 1) * 2}</div>
+        <div class="p-num l">Pág. ${(i+1)*2}</div>
       </div>`;
-
-    root.appendChild(page);
-    pages.push(page);
+    root.appendChild(pg);
+    pages.push(pg);
   });
 }
 
-function escapeHTML(str) {
-  return String(str)
-    .replace(/&/g,'&amp;')
-    .replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;')
-    .replace(/"/g,'&quot;');
+/* ══════════════════════════════════════════════════════════
+   LIBRO — navegación
+══════════════════════════════════════════════════════════ */
+function updateNav(){
+  document.getElementById('btn-prev').disabled = curPage <= 0;
+  document.getElementById('btn-next').disabled = curPage >= pages.length - 1;
+  document.getElementById('nav-ind').textContent = `${curPage+1} / ${pages.length}`;
 }
 
-/* ════════════════════════════════════════════════════════
-   NAVEGACIÓN DEL LIBRO
-════════════════════════════════════════════════════════ */
-function updateNav() {
-  document.getElementById('btn-prev').disabled    = currentPage <= 0;
-  document.getElementById('btn-next').disabled    = currentPage >= pages.length - 1;
-  document.getElementById('nav-indicator').textContent = `${currentPage + 1} / ${pages.length}`;
-}
-
-function openBook() {
-  if (isOpen) return;
-  isOpen = true;
-
+function openBook(){
+  if(bookOpen) return;
+  bookOpen = true;
   document.getElementById('cover').classList.add('flipped');
   document.getElementById('book-nav').style.display  = 'flex';
   document.getElementById('btn-add').style.display   = 'flex';
   document.getElementById('music-bar').style.display = 'flex';
-
-  // Precargar primera canción en YouTube
-  if (ytReady) loadTrack(0, false);
-  else {
-    // Si la API aún no cargó, esperar
-    const waitYT = setInterval(() => {
-      if (ytReady) { loadTrack(0, false); clearInterval(waitYT); }
-    }, 300);
-  }
-
-  setTimeout(() => goToPage(0), 720);
+  setTimeout(() => goTo(0), 700);
 }
 
-function goToPage(target) {
-  if (isFlipping || target === currentPage) return;
-  if (target < 0 || target >= pages.length)  return;
+function goTo(target){
+  if(flipping || target === curPage) return;
+  if(target < 0 || target >= pages.length) return;
+  flipping = true;
 
-  isFlipping = true;
-
-  // Construir lista de pasos — garantiza orden correcto
   const steps = [];
-  if (target > currentPage) {
-    for (let i = currentPage + 1; i <= target; i++) steps.push({ el: pages[i], flip: true });
+  if(target > curPage){
+    for(let i = curPage+1; i <= target; i++) steps.push({el:pages[i], f:true});
   } else {
-    for (let i = currentPage; i > target; i--)     steps.push({ el: pages[i], flip: false });
+    for(let i = curPage; i > target; i--)   steps.push({el:pages[i], f:false});
   }
 
-  let step = 0;
+  let s = 0;
   const run = () => {
-    if (step >= steps.length) {
-      currentPage = target;
-      updateNav();
-      isFlipping = false;
-      return;
-    }
-    const { el, flip } = steps[step++];
-    flip ? el.classList.add('flipped') : el.classList.remove('flipped');
-    // Si hay más de un paso, esperar a que termine la transición antes del siguiente
+    if(s >= steps.length){ curPage = target; updateNav(); flipping = false; return; }
+    const {el, f} = steps[s++];
+    f ? el.classList.add('flipped') : el.classList.remove('flipped');
     setTimeout(run, steps.length === 1 ? 0 : 118);
   };
   run();
 }
 
-function nextPage() { if (!isFlipping) goToPage(currentPage + 1); }
-function prevPage() { if (!isFlipping) goToPage(currentPage - 1); }
+function nextPage(){ if(!flipping) goTo(curPage+1); }
+function prevPage(){ if(!flipping) goTo(curPage-1); }
 
-// Teclado
 document.addEventListener('keydown', e => {
-  if (!isOpen) return;
-  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') nextPage();
-  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   prevPage();
+  if(!bookOpen) return;
+  if(e.key==='ArrowRight'||e.key==='ArrowDown') nextPage();
+  if(e.key==='ArrowLeft' ||e.key==='ArrowUp')   prevPage();
 });
 
-// Swipe táctil
-let touchStartX = 0;
-document.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
-document.addEventListener('touchend', e => {
-  if (!isOpen) return;
-  const dx = e.changedTouches[0].clientX - touchStartX;
-  if (dx < -44) nextPage();
-  if (dx >  44) prevPage();
+let tx = 0;
+document.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, {passive:true});
+document.addEventListener('touchend',   e => {
+  if(!bookOpen) return;
+  const dx = e.changedTouches[0].clientX - tx;
+  if(dx < -44) nextPage();
+  if(dx >  44) prevPage();
 });
 
-/* ════════════════════════════════════════════════════════
+/* ══════════════════════════════════════════════════════════
    FRASES PERSONALIZADAS
-════════════════════════════════════════════════════════ */
-function openAddModal() {
-  ['input-quote', 'input-author', 'input-book'].forEach(id => {
-    document.getElementById(id).value = '';
-  });
-  document.getElementById('overlay-add').classList.add('visible');
+══════════════════════════════════════════════════════════ */
+function openAddModal(){
+  ['in-quote','in-author','in-book'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('ov-add').classList.add('on');
 }
+function closeAddModal(){ document.getElementById('ov-add').classList.remove('on'); }
 
-function closeAddModal() {
-  document.getElementById('overlay-add').classList.remove('visible');
-}
-
-function saveQuote() {
-  const quote  = document.getElementById('input-quote').value.trim();
-  const author = document.getElementById('input-author').value.trim();
-  const book   = document.getElementById('input-book').value.trim();
-
-  if (!quote) {
-    document.getElementById('input-quote').focus();
-    return;
-  }
-
-  const quotes = loadCustomQuotes();
-  quotes.push({ quote, author, source: book || 'Nuestro libro', book, savedAt: Date.now() });
-  saveCustomQuotes(quotes);
-
+function saveQuote(){
+  const q = document.getElementById('in-quote').value.trim();
+  const a = document.getElementById('in-author').value.trim();
+  const b = document.getElementById('in-book').value.trim();
+  if(!q){ document.getElementById('in-quote').focus(); return; }
+  const arr = loadQ();
+  arr.push({q, a, s: b||'Nuestro libro', t: Date.now()});
+  saveQ(arr);
   closeAddModal();
   buildBook();
-  setTimeout(() => goToPage(pages.length - 1), 380);
+  setTimeout(() => goTo(pages.length - 1), 380);
   showToast('✦ Frase guardada en el libro 💖');
   spawnHearts();
 }
 
-function openDeleteModal(customIndex) {
-  pendingDelete = customIndex;
-  const quotes = loadCustomQuotes();
-  const q = quotes[customIndex];
-  const preview = q ? `"${q.quote.slice(0, 58)}${q.quote.length > 58 ? '…' : ''}"` : '';
-  document.getElementById('confirm-text').textContent = preview;
-  document.getElementById('overlay-confirm').classList.add('visible');
+function openDeleteModal(idx){
+  delPending = idx;
+  const q = loadQ()[idx];
+  document.getElementById('confirm-text').textContent =
+    q ? `"${q.q.slice(0,55)}${q.q.length>55?'…':''}"` : '';
+  document.getElementById('ov-confirm').classList.add('on');
 }
+function closeConfirm(){ document.getElementById('ov-confirm').classList.remove('on'); delPending = -1; }
 
-function closeConfirmModal() {
-  document.getElementById('overlay-confirm').classList.remove('visible');
-  pendingDelete = -1;
-}
-
-function confirmDelete() {
-  if (pendingDelete < 0) return;
-  const quotes = loadCustomQuotes();
-  quotes.splice(pendingDelete, 1);
-  saveCustomQuotes(quotes);
-  closeConfirmModal();
-
-  // Reposicionar sin saltar
-  const newTarget = Math.min(currentPage, FIXED_PAGES.length + quotes.length - 1);
-  currentPage = -1;
+function doDelete(){
+  if(delPending < 0) return;
+  const arr = loadQ();
+  arr.splice(delPending, 1);
+  saveQ(arr);
+  closeConfirm();
+  const ni = Math.min(curPage, FIXED.length + arr.length - 1);
+  curPage = -1;
   buildBook();
-  for (let i = 0; i <= newTarget; i++) pages[i]?.classList.add('flipped');
-  currentPage = newTarget;
+  for(let i = 0; i <= ni; i++) pages[i]?.classList.add('flipped');
+  curPage = ni;
   updateNav();
   showToast('Frase eliminada del libro');
 }
 
-// Cerrar modal tocando el fondo
-function handleOverlayClick(event, overlayId) {
-  if (event.target.id === overlayId) {
-    if (overlayId === 'overlay-add')     closeAddModal();
-    if (overlayId === 'overlay-confirm') closeConfirmModal();
-  }
-}
-
-/* ════════════════════════════════════════════════════════
+/* ══════════════════════════════════════════════════════════
    MÚSICA — YouTube IFrame API
-   Para agregar canciones: busca el video en YouTube,
-   copia los 11 caracteres después de ?v= y agrégalos aquí.
-   Ejemplo: youtube.com/watch?v=fV4DiAyExN0 → id: 'fV4DiAyExN0'
-════════════════════════════════════════════════════════ */
-const PLAYLIST = [
-  { title: 'The Reason',  id: 'fV4DiAyExN0' },  // Hoobastank
-  { title: 'Wonderwall',  id: 'bx1Bh8ZvH84' },  // Oasis
-];
+   Añadir canciones: agrega {title:'Nombre', id:'YTID'} al PLAYLIST
+══════════════════════════════════════════════════════════ */
+let ytPlayer  = null;
+let ytReady   = false;
+let trackIdx  = 0;
+let rafProg   = null;
 
-let trackIndex = 0;
-let ytPlayer   = null;
-let ytReady    = false;
-
-// Cargar la API de YouTube de forma asíncrona
-(function loadYTApi() {
-  const tag = document.createElement('script');
-  tag.src   = 'https://www.youtube.com/iframe_api';
-  document.head.appendChild(tag);
+// Inyectar script de la API
+(function(){
+  const s = document.createElement('script');
+  s.src = 'https://www.youtube.com/iframe_api';
+  document.head.appendChild(s);
 })();
 
-// Callback requerido por la API de YouTube
-function onYouTubeIframeAPIReady() {
+// Callback global requerido por YouTube
+window.onYouTubeIframeAPIReady = function(){
   ytPlayer = new YT.Player('yt-player', {
-    height: '1', width: '1',
+    height:'1', width:'1',
     videoId: PLAYLIST[0].id,
     host: 'https://www.youtube-nocookie.com',
-    playerVars: {
-      autoplay:        0,
-      controls:        0,
-      disablekb:       1,
-      fs:              0,
-      iv_load_policy:  3,
-      modestbranding:  1,
-      rel:             0,
-      playsinline:     1,
-      origin:          window.location.origin,
+    playerVars:{
+      autoplay:0, controls:0, disablekb:1, fs:0,
+      iv_load_policy:3, modestbranding:1, rel:0, playsinline:1,
     },
-    events: {
-      onReady: () => {
-        ytReady = true;
-      },
-      onStateChange: (e) => {
-        if (e.data === YT.PlayerState.PLAYING) {
-          setPlayIcon('⏸');
-          startProgressLoop();
-        }
-        if (e.data === YT.PlayerState.PAUSED) {
-          setPlayIcon('▷');
-          stopProgressLoop();
-        }
-        if (e.data === YT.PlayerState.ENDED) {
-          nextTrack();
-        }
-      },
-    },
-  });
-}
-
-// Barra de progreso
-let progressRaf = null;
-
-function startProgressLoop() {
-  if (progressRaf) return;
-  const tick = () => {
-    if (!ytPlayer || !ytReady) return;
-    const duration = ytPlayer.getDuration();
-    const current  = ytPlayer.getCurrentTime();
-    if (duration > 0) {
-      document.getElementById('music-progress-fill').style.width =
-        ((current / duration) * 100) + '%';
+    events:{
+      onReady: () => { ytReady = true; },
+      onStateChange: e => {
+        if(e.data === YT.PlayerState.PLAYING){ setPlayIcon('⏸'); startProg(); }
+        if(e.data === YT.PlayerState.PAUSED ){ setPlayIcon('▷'); stopProg();  }
+        if(e.data === YT.PlayerState.ENDED  ){ nextTrack(); }
+      }
     }
-    progressRaf = requestAnimationFrame(tick);
+  });
+};
+
+function setPlayIcon(ic){ document.getElementById('btn-play').textContent = ic; }
+
+function startProg(){
+  if(rafProg) return;
+  const tick = () => {
+    if(ytPlayer && ytReady){
+      const dur = ytPlayer.getDuration();
+      const cur = ytPlayer.getCurrentTime();
+      if(dur > 0) document.getElementById('music-fill').style.width = ((cur/dur)*100)+'%';
+    }
+    rafProg = requestAnimationFrame(tick);
   };
-  progressRaf = requestAnimationFrame(tick);
+  rafProg = requestAnimationFrame(tick);
+}
+function stopProg(){ if(rafProg){ cancelAnimationFrame(rafProg); rafProg = null; } }
+
+function loadTrack(idx, play){
+  trackIdx = ((idx % PLAYLIST.length) + PLAYLIST.length) % PLAYLIST.length;
+  document.getElementById('music-title').textContent = '♩ ' + PLAYLIST[trackIdx].title;
+  document.getElementById('music-fill').style.width = '0%';
+  if(!ytReady) return;
+  if(play) ytPlayer.loadVideoById(PLAYLIST[trackIdx].id);
+  else     ytPlayer.cueVideoById(PLAYLIST[trackIdx].id);
 }
 
-function stopProgressLoop() {
-  if (progressRaf) { cancelAnimationFrame(progressRaf); progressRaf = null; }
+function togglePlay(){
+  if(!ytReady) return;
+  ytPlayer.getPlayerState() === YT.PlayerState.PLAYING
+    ? ytPlayer.pauseVideo()
+    : ytPlayer.playVideo();
+}
+function nextTrack(){ loadTrack(trackIdx+1, ytReady); }
+function prevTrack(){ loadTrack(trackIdx-1, ytReady); }
+
+function seekMusic(e){
+  if(!ytReady) return;
+  const dur = ytPlayer.getDuration();
+  if(!dur) return;
+  const rect = e.currentTarget.getBoundingClientRect();
+  ytPlayer.seekTo(((e.clientX - rect.left) / rect.width) * dur, true);
 }
 
-function setPlayIcon(icon) {
-  document.getElementById('btn-play').textContent = icon;
-}
+/* ══════════════════════════════════════════════════════════
+   CONTADOR — años / meses / días / horas  (preciso)
+══════════════════════════════════════════════════════════ */
+function calcDiff(from, to){
+  let y = to.getFullYear()  - from.getFullYear();
+  let mo= to.getMonth()     - from.getMonth();
+  let d = to.getDate()      - from.getDate();
+  let h = to.getHours()     - from.getHours();
 
-function loadTrack(index, autoplay) {
-  trackIndex = ((index % PLAYLIST.length) + PLAYLIST.length) % PLAYLIST.length;
-  document.getElementById('music-title').textContent = '♩ ' + PLAYLIST[trackIndex].title;
-  document.getElementById('music-progress-fill').style.width = '0%';
-  if (!ytReady) return;
-  if (autoplay) ytPlayer.loadVideoById(PLAYLIST[trackIndex].id);
-  else          ytPlayer.cueVideoById(PLAYLIST[trackIndex].id);
-}
-
-function togglePlay() {
-  if (!ytReady) return;
-  const state = ytPlayer.getPlayerState();
-  if (state === YT.PlayerState.PLAYING) ytPlayer.pauseVideo();
-  else ytPlayer.playVideo();
-}
-
-function nextTrack() { loadTrack(trackIndex + 1, ytReady); }
-function prevTrack() { loadTrack(trackIndex - 1, ytReady); }
-
-function seekMusic(event) {
-  if (!ytReady) return;
-  const duration = ytPlayer.getDuration();
-  if (!duration) return;
-  const rect = event.currentTarget.getBoundingClientRect();
-  const pct  = (event.clientX - rect.left) / rect.width;
-  ytPlayer.seekTo(pct * duration, true);
-}
-
-/* ════════════════════════════════════════════════════════
-   CONTADOR — años / meses / días / horas
-════════════════════════════════════════════════════════ */
-function calcTimeDiff(from, to) {
-  let years  = to.getFullYear()  - from.getFullYear();
-  let months = to.getMonth()     - from.getMonth();
-  let days   = to.getDate()      - from.getDate();
-  const hours = to.getHours()   - from.getHours();
-
-  if (days < 0) {
-    months--;
-    const prevMonth = new Date(to.getFullYear(), to.getMonth(), 0);
-    days += prevMonth.getDate();
+  if(h < 0){ h += 24; d--; }
+  if(d < 0){
+    mo--;
+    // días en el mes anterior al mes actual de "to"
+    d += new Date(to.getFullYear(), to.getMonth(), 0).getDate();
   }
-  if (months < 0) { years--; months += 12; }
+  if(mo < 0){ mo += 12; y--; }
 
-  return { years, months, days, hours: ((hours % 24) + 24) % 24 };
+  return { y, mo, d, h };
 }
 
-function updateCounter() {
-  const now  = new Date();
-  const diff = calcTimeDiff(START_DATE, now);
-  document.getElementById('c-years').textContent  = diff.years;
-  document.getElementById('c-months').textContent = diff.months;
-  document.getElementById('c-days').textContent   = diff.days;
-  document.getElementById('c-hours').textContent  = diff.hours;
+function updateCounter(){
+  const r = calcDiff(START, new Date());
+  document.getElementById('c-y').textContent  = r.y;
+  document.getElementById('c-m').textContent  = r.mo;
+  document.getElementById('c-d').textContent  = r.d;
+  document.getElementById('c-h').textContent  = r.h;
 }
 
-// Fecha de inicio formateada
 document.getElementById('c-since').textContent =
-  'Desde el ' + START_DATE.toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' }) + ' 💖';
+  'Desde el ' + START.toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'}) + ' 💖';
 
-// Actualizar cada minuto (no necesitamos precisión de segundos)
 updateCounter();
-setInterval(updateCounter, 60_000);
+setInterval(updateCounter, 60000); // actualiza cada minuto
 
-/* ════════════════════════════════════════════════════════
-   PARTÍCULAS — ultra ligeras, sin lag
-   Máx. 12 puntos simultáneos, sin rotación ni cálculos pesados
-════════════════════════════════════════════════════════ */
-(function initParticles() {
-  const canvas = document.getElementById('bg-canvas');
-  const ctx    = canvas.getContext('2d');
-  let   pts    = [];
-  let   lastSpawn = 0;
+/* ══════════════════════════════════════════════════════════
+   PARTÍCULAS — sin lag (máx 12, spawn cada 700ms)
+══════════════════════════════════════════════════════════ */
+(function(){
+  const cv  = document.getElementById('bg-canvas');
+  const ctx = cv.getContext('2d');
+  let pts = [], last = 0;
 
-  function resize() {
-    canvas.width  = window.innerWidth;
-    canvas.height = window.innerHeight;
-  }
-  window.addEventListener('resize', resize, { passive: true });
+  function resize(){ cv.width = innerWidth; cv.height = innerHeight; }
+  window.addEventListener('resize', resize, {passive:true});
   resize();
 
-  function spawnParticle() {
-    pts.push({
-      x:  Math.random() * canvas.width,
-      y:  canvas.height + 5,
-      vy: -(Math.random() * 0.38 + 0.14),
-      o:  0.5 + Math.random() * 0.15,
-      r:  1.4 + Math.random() * 1.2,
-    });
-  }
-
-  let raf;
-  function loop(ts) {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Spawn controlado — cada ~700ms, máx 12 partículas
-    if (pts.length < 12 && ts - lastSpawn > 700) {
-      spawnParticle();
-      lastSpawn = ts;
+  function loop(ts){
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    if(pts.length < 12 && ts - last > 700){
+      pts.push({ x:Math.random()*cv.width, y:cv.height+5, vy:Math.random()*0.38+0.14, o:0.48+Math.random()*0.14, r:1.4+Math.random()*1.1 });
+      last = ts;
     }
-
-    ctx.fillStyle = 'rgba(232,155,178,1)'; // color fijo, sólo cambia alpha
     pts = pts.filter(p => p.o > 0.01);
-
-    for (const p of pts) {
-      p.y -= p.vy;  // sube
-      p.o -= 0.0008;
+    for(const p of pts){
+      p.y -= p.vy; p.o -= 0.0007;
       ctx.globalAlpha = p.o;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.fillStyle   = '#e8a0b4';
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fill();
     }
-
     ctx.globalAlpha = 1;
-    raf = requestAnimationFrame(loop);
+    requestAnimationFrame(loop);
   }
-
-  raf = requestAnimationFrame(loop);
+  requestAnimationFrame(loop);
 })();
 
-/* ════════════════════════════════════════════════════════
-   UTILIDADES UI
-════════════════════════════════════════════════════════ */
-function showToast(msg) {
+/* ══════════════════════════════════════════════════════════
+   UTILIDADES
+══════════════════════════════════════════════════════════ */
+function showToast(m){
   const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 2600);
+  el.textContent = m; el.classList.add('on');
+  setTimeout(() => el.classList.remove('on'), 2600);
+}
+function spawnHearts(){
+  ['💖','💗','💕','🌹','✨'].forEach((e,i) => setTimeout(() => {
+    const el = document.createElement('div');
+    el.className = 'fheart'; el.textContent = e;
+    el.style.left = (18 + Math.random()*64)+'vw';
+    el.style.bottom = '18vh';
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 2300);
+  }, i*110));
 }
 
-function spawnHearts() {
-  const emojis = ['💖', '💗', '💕', '🌹', '✨'];
-  emojis.forEach((e, i) => {
-    setTimeout(() => {
-      const el = document.createElement('div');
-      el.className   = 'floating-heart';
-      el.textContent = e;
-      el.style.left  = (18 + Math.random() * 64) + 'vw';
-      el.style.bottom = '18vh';
-      document.body.appendChild(el);
-      setTimeout(() => el.remove(), 2300);
-    }, i * 110);
-  });
-}
-
-/* ════════════════════════════════════════════════════════
+/* ══════════════════════════════════════════════════════════
    INIT
-════════════════════════════════════════════════════════ */
+══════════════════════════════════════════════════════════ */
 buildBook();
 </script>
 </body>
