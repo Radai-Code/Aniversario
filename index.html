@@ -503,8 +503,10 @@
 
   </div><!-- /app -->
 
-  <!-- Elemento de audio nativo -->
-  <audio id="audio-player" preload="none"></audio>
+  <!-- YouTube iframe oculto fuera de pantalla (display:none bloquea el audio) -->
+  <div id="yt-container" style="position:fixed;bottom:-400px;left:0;width:1px;height:1px;opacity:0;pointer-events:none;">
+    <div id="yt-player"></div>
+  </div>
 
   <!-- Botón agregar frase -->
   <button class="btn-add" id="btn-add" onclick="openAddModal()" title="Escribir en el libro">+</button>
@@ -675,8 +677,14 @@ function openBook() {
   document.getElementById('btn-add').style.display   = 'flex';
   document.getElementById('music-bar').style.display = 'flex';
 
-  // Precargar primera canción
-  loadTrack(0, false);
+  // Precargar primera canción en YouTube
+  if (ytReady) loadTrack(0, false);
+  else {
+    // Si la API aún no cargó, esperar
+    const waitYT = setInterval(() => {
+      if (ytReady) { loadTrack(0, false); clearInterval(waitYT); }
+    }, 300);
+  }
 
   setTimeout(() => goToPage(0), 720);
 }
@@ -806,46 +814,117 @@ function handleOverlayClick(event, overlayId) {
 }
 
 /* ════════════════════════════════════════════════════════
-   MÚSICA — Archive.org, nativa, sin anuncios
+   MÚSICA — YouTube IFrame API
+   Para agregar canciones: busca el video en YouTube,
+   copia los 11 caracteres después de ?v= y agrégalos aquí.
+   Ejemplo: youtube.com/watch?v=fV4DiAyExN0 → id: 'fV4DiAyExN0'
 ════════════════════════════════════════════════════════ */
-const audioPlayer = document.getElementById('audio-player');
+const PLAYLIST = [
+  { title: 'The Reason',  id: 'fV4DiAyExN0' },  // Hoobastank
+  { title: 'Wonderwall',  id: 'bx1Bh8ZvH84' },  // Oasis
+];
 
-audioPlayer.addEventListener('ended',         () => nextTrack());
-audioPlayer.addEventListener('timeupdate',    updateProgress);
-audioPlayer.addEventListener('play',          () => setPlayIcon('⏸'));
-audioPlayer.addEventListener('pause',         () => setPlayIcon('▷'));
+let trackIndex = 0;
+let ytPlayer   = null;
+let ytReady    = false;
+
+// Cargar la API de YouTube de forma asíncrona
+(function loadYTApi() {
+  const tag = document.createElement('script');
+  tag.src   = 'https://www.youtube.com/iframe_api';
+  document.head.appendChild(tag);
+})();
+
+// Callback requerido por la API de YouTube
+function onYouTubeIframeAPIReady() {
+  ytPlayer = new YT.Player('yt-player', {
+    height: '1', width: '1',
+    videoId: PLAYLIST[0].id,
+    host: 'https://www.youtube-nocookie.com',
+    playerVars: {
+      autoplay:        0,
+      controls:        0,
+      disablekb:       1,
+      fs:              0,
+      iv_load_policy:  3,
+      modestbranding:  1,
+      rel:             0,
+      playsinline:     1,
+      origin:          window.location.origin,
+    },
+    events: {
+      onReady: () => {
+        ytReady = true;
+      },
+      onStateChange: (e) => {
+        if (e.data === YT.PlayerState.PLAYING) {
+          setPlayIcon('⏸');
+          startProgressLoop();
+        }
+        if (e.data === YT.PlayerState.PAUSED) {
+          setPlayIcon('▷');
+          stopProgressLoop();
+        }
+        if (e.data === YT.PlayerState.ENDED) {
+          nextTrack();
+        }
+      },
+    },
+  });
+}
+
+// Barra de progreso
+let progressRaf = null;
+
+function startProgressLoop() {
+  if (progressRaf) return;
+  const tick = () => {
+    if (!ytPlayer || !ytReady) return;
+    const duration = ytPlayer.getDuration();
+    const current  = ytPlayer.getCurrentTime();
+    if (duration > 0) {
+      document.getElementById('music-progress-fill').style.width =
+        ((current / duration) * 100) + '%';
+    }
+    progressRaf = requestAnimationFrame(tick);
+  };
+  progressRaf = requestAnimationFrame(tick);
+}
+
+function stopProgressLoop() {
+  if (progressRaf) { cancelAnimationFrame(progressRaf); progressRaf = null; }
+}
 
 function setPlayIcon(icon) {
   document.getElementById('btn-play').textContent = icon;
 }
 
-function updateProgress() {
-  if (!audioPlayer.duration) return;
-  const pct = (audioPlayer.currentTime / audioPlayer.duration) * 100;
-  document.getElementById('music-progress-fill').style.width = pct + '%';
-}
-
 function loadTrack(index, autoplay) {
   trackIndex = ((index % PLAYLIST.length) + PLAYLIST.length) % PLAYLIST.length;
-  audioPlayer.src = PLAYLIST[trackIndex].url;
   document.getElementById('music-title').textContent = '♩ ' + PLAYLIST[trackIndex].title;
   document.getElementById('music-progress-fill').style.width = '0%';
-  if (autoplay) audioPlayer.play().catch(() => {});
+  if (!ytReady) return;
+  if (autoplay) ytPlayer.loadVideoById(PLAYLIST[trackIndex].id);
+  else          ytPlayer.cueVideoById(PLAYLIST[trackIndex].id);
 }
 
 function togglePlay() {
-  if (audioPlayer.paused) audioPlayer.play().catch(() => {});
-  else audioPlayer.pause();
+  if (!ytReady) return;
+  const state = ytPlayer.getPlayerState();
+  if (state === YT.PlayerState.PLAYING) ytPlayer.pauseVideo();
+  else ytPlayer.playVideo();
 }
 
-function nextTrack() { loadTrack(trackIndex + 1, !audioPlayer.paused); }
-function prevTrack() { loadTrack(trackIndex - 1, !audioPlayer.paused); }
+function nextTrack() { loadTrack(trackIndex + 1, ytReady); }
+function prevTrack() { loadTrack(trackIndex - 1, ytReady); }
 
 function seekMusic(event) {
-  if (!audioPlayer.duration) return;
+  if (!ytReady) return;
+  const duration = ytPlayer.getDuration();
+  if (!duration) return;
   const rect = event.currentTarget.getBoundingClientRect();
   const pct  = (event.clientX - rect.left) / rect.width;
-  audioPlayer.currentTime = pct * audioPlayer.duration;
+  ytPlayer.seekTo(pct * duration, true);
 }
 
 /* ════════════════════════════════════════════════════════
