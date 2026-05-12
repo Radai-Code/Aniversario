@@ -25,8 +25,9 @@
         linear-gradient(150deg,#fce4ec,#f8bbd0);
     }
 
-    #bg-canvas { position:fixed; inset:0; pointer-events:none; z-index:0; will-change: transform; }
+    #bg-canvas { position:fixed; inset:0; pointer-events:none; z-index:0; }
 
+    /* ── LAYOUT ── */
     .app {
       position:relative; z-index:10;
       width:100%; height:100%;
@@ -36,7 +37,7 @@
       gap:clamp(7px,1.6vh,13px);
     }
 
-    /* CONTADOR */
+    /* ── CONTADOR ── */
     .counter {
       width:min(460px,100%);
       background:var(--glass); backdrop-filter:blur(16px);
@@ -44,15 +45,22 @@
       padding:clamp(7px,1.5vh,11px) clamp(14px,4vw,26px);
       text-align:center; box-shadow:0 4px 18px var(--sh);
     }
-    .counter-main { display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:4px 10px; }
+    .counter-main {
+      display:flex; align-items:center; justify-content:center;
+      flex-wrap:wrap; gap:4px 10px;
+    }
     .counter-unit { display:flex; flex-direction:column; align-items:center; }
     .counter-val  { font-family:'Playfair Display',serif; font-size:clamp(1rem,3.8vw,1.45rem); color:var(--rose); font-weight:700; line-height:1; }
     .counter-lbl  { font-size:clamp(0.52rem,1.5vw,0.62rem); color:var(--ink); opacity:0.48; text-transform:uppercase; letter-spacing:0.1em; }
     .counter-sep  { color:rgba(194,103,138,0.32); font-size:0.88rem; align-self:flex-start; margin-top:3px; }
     .counter-since{ margin-top:4px; font-size:clamp(0.56rem,1.6vw,0.68rem); color:var(--rose); opacity:0.68; font-style:italic; }
 
-    /* LIBRO */
-    .book-scene { width:min(460px,100%); height:clamp(240px,43vh,400px); perspective:1800px; flex-shrink:0; }
+    /* ── LIBRO ── */
+    .book-scene {
+      width:min(460px,100%);
+      height:clamp(240px,43vh,400px);
+      perspective:1800px; flex-shrink:0;
+    }
     .book { width:100%; height:100%; position:relative; transform-style:preserve-3d; }
 
     .spine {
@@ -61,17 +69,29 @@
       border-radius:6px 0 0 6px; z-index:200;
       box-shadow:-2px 0 8px rgba(60,20,40,0.22);
     }
+    .spine-dot { position:absolute; left:50%; transform:translateX(-50%); width:4px; height:4px; border-radius:50%; background:rgba(255,255,255,0.38); }
 
     .page {
       position:absolute; top:4px; left:26px;
       width:calc(100% - 30px); height:calc(100% - 8px);
       background:var(--parch); border-radius:0 10px 10px 0;
       transform-origin:left center;
-      transition:transform 0.8s cubic-bezier(0.645, 0.045, 0.355, 1);
+      transition:transform 0.82s cubic-bezier(0.645,0.045,0.355,1);
       transform-style:preserve-3d; backface-visibility:hidden;
       box-shadow:inset 2px 0 8px rgba(0,0,0,0.04), 2px 2px 7px rgba(0,0,0,0.1);
       will-change: transform;
     }
+    .page::after {
+      content:''; position:absolute; inset:0; border-radius:0 10px 10px 0; pointer-events:none;
+      background:repeating-linear-gradient(transparent,transparent 30px,rgba(232,160,180,0.07) 30px,rgba(232,160,180,0.07) 31px);
+    }
+    .page:not(.cover)::before {
+      content:''; position:absolute; bottom:0; right:0; z-index:3;
+      border-style:solid; border-width:0 0 18px 18px;
+      border-color:transparent transparent rgba(232,160,180,0.2) transparent;
+      transition:border-width 0.28s;
+    }
+    .page:not(.cover):hover::before { border-width:0 0 30px 30px; border-color:transparent transparent rgba(232,160,180,0.36) transparent; }
     .page.flipped { transform:rotateY(-180deg); }
 
     .p-front, .p-back {
@@ -82,38 +102,107 @@
     }
     .p-back { transform:rotateY(180deg); background:#fdf5f8; }
 
+    .p-ornament { width:44px; height:1px; background:linear-gradient(90deg,transparent,var(--gold),transparent); margin:8px auto; }
+    .p-quote    { font-size:clamp(0.82rem,2.7vw,1.1rem); font-style:italic; color:var(--ink); line-height:1.55; margin:5px 0; }
+    .p-source   { font-size:clamp(0.54rem,1.6vw,0.68rem); color:var(--rose); letter-spacing:2px; text-transform:uppercase; font-weight:700; }
+    .p-num      { position:absolute; bottom:9px; font-size:0.56rem; color:rgba(60,20,40,0.25); font-style:italic; }
+    .p-num.r    { right:13px; } .p-num.l { left:13px; }
+    .p-author   { font-size:0.58rem; color:var(--rose); opacity:0.6; margin-top:4px; font-style:italic; }
+    .p-date     { font-size:0.54rem; color:rgba(60,20,40,0.3); margin-top:3px; }
+    .p-badge    { font-size:0.54rem; letter-spacing:0.12em; text-transform:uppercase; background:var(--rose); color:white; padding:2px 9px; border-radius:20px; margin-bottom:6px; display:inline-block; }
+    .p-del      { position:absolute; top:8px; right:9px; background:rgba(255,255,255,0.85); border:1.5px solid rgba(194,103,138,0.28); border-radius:50%; width:27px; height:27px; display:flex; align-items:center; justify-content:center; font-size:1rem; line-height:1; cursor:pointer; color:var(--rose); z-index:5; }
+    .p-del:active { background:#fee; }
+
     .cover { background:linear-gradient(135deg,#f4b8cf,#e8839f 45%,#c2678a) !important; z-index:150; cursor:pointer; border-radius:0 12px 12px 0; }
+    .cover .p-front { background:transparent; }
+    .cover-border { position:absolute; inset:12px; border:1.5px solid rgba(255,255,255,0.3); border-radius:0 8px 8px 0; }
 
-    /* NAV & MUSIC (Simplificado para rendimiento) */
-    .book-nav { display:flex; align-items:center; gap:14px; margin-top: 10px; }
+    /* ── NAV ── */
+    .book-nav { display:flex; align-items:center; gap:14px; }
     .nav-btn  {
-      width:40px; height:40px; border-radius:50%;
-      border:2px solid rgba(194,103,138,0.32); background:var(--glass);
-      color:var(--rose); font-size:1rem; cursor:pointer;
+      width:clamp(36px,9vw,42px); height:clamp(36px,9vw,42px); border-radius:50%;
+      border:2px solid rgba(194,103,138,0.32); background:var(--glass); backdrop-filter:blur(8px);
+      color:var(--rose); font-size:1.05rem; cursor:pointer;
       display:flex; align-items:center; justify-content:center;
+      box-shadow:0 3px 10px var(--sh); transition:background 0.18s,color 0.18s,transform 0.15s;
+      touch-action:manipulation;
     }
+    .nav-btn:active   { background:var(--rose); color:white; transform:scale(0.9); }
+    .nav-btn:disabled { opacity:0.2; cursor:default; pointer-events:none; }
+    .nav-indicator    { font-family:'Playfair Display',serif; font-size:0.8rem; color:var(--ink); opacity:0.46; min-width:54px; text-align:center; }
 
+    /* ── MÚSICA ── */
     .music-bar {
-      width:min(460px,100%); background:var(--glass); backdrop-filter:blur(14px);
+      width:min(460px,100%);
+      background:var(--glass); backdrop-filter:blur(14px);
       border:1.5px solid rgba(194,103,138,0.28); border-radius:16px;
-      padding:10px 15px; display:flex; align-items:center; gap:12px;
+      padding:clamp(8px,2vw,12px) clamp(11px,3vw,17px);
+      display:flex; align-items:center; gap:12px;
       box-shadow:0 3px 14px var(--sh);
     }
-    .music-info { flex:1; }
-    .music-progress { width:100%; height:4px; background:rgba(194,103,138,0.1); border-radius:2px; margin-top:8px; cursor:pointer; position:relative; }
-    .music-fill { height:100%; background:var(--rose); width:0%; border-radius:2px; }
-
-    /* MODALES */
-    .overlay { position:fixed; inset:0; background:rgba(0,0,0,0.4); backdrop-filter:blur(4px); z-index:1000; display:none; align-items:center; justify-content:center; }
-    .overlay.on { display:flex; }
-    .mbox { background:var(--parch); padding:25px; border-radius:20px; width:90%; max-width:400px; }
-
-    .btn-add {
-      position:fixed; bottom:20px; right:20px; width:50px; height:50px;
-      background:var(--rose); color:white; border:none; border-radius:50%;
-      font-size:24px; cursor:pointer; box-shadow:0 4px 15px var(--sh);
-      display:none; align-items:center; justify-content:center; z-index:100;
+    .music-info  { flex:1; min-width:0; }
+    .music-title { font-size:clamp(0.64rem,2vw,0.78rem); color:var(--rose); font-weight:700; letter-spacing:0.06em; text-transform:uppercase; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .music-sub   { font-size:clamp(0.54rem,1.5vw,0.64rem); color:var(--ink); opacity:0.46; margin-top:2px; font-style:italic; }
+    .music-progress { width:100%; height:3px; border-radius:2px; background:rgba(194,103,138,0.18); margin-top:7px; cursor:pointer; overflow:hidden; }
+    .music-fill     { height:100%; border-radius:2px; background:linear-gradient(90deg,var(--roselt),var(--rose)); width:0%; transition:width 0.4s linear; }
+    .music-controls { display:flex; gap:7px; flex-shrink:0; }
+    .music-btn {
+      width:33px; height:33px; border-radius:50%;
+      border:1.5px solid rgba(194,103,138,0.3); background:rgba(255,255,255,0.82);
+      color:var(--rose); font-size:0.95rem; cursor:pointer;
+      display:flex; align-items:center; justify-content:center;
+      transition:background 0.18s,color 0.18s,transform 0.15s;
+      touch-action:manipulation;
     }
+    .music-btn:active { background:var(--rose); color:white; transform:scale(0.9); }
+
+    /* ── BTN AGREGAR ── */
+    .btn-add {
+      position:fixed; bottom:clamp(14px,3vh,22px); left:clamp(14px,3vw,22px); z-index:500;
+      width:44px; height:44px; border-radius:50%;
+      background:rgba(255,255,255,0.9); backdrop-filter:blur(10px);
+      border:2px solid var(--rose); color:var(--rose);
+      font-size:1.55rem; font-weight:300; line-height:1;
+      cursor:pointer; display:none; align-items:center; justify-content:center;
+      box-shadow:0 4px 16px var(--sh); touch-action:manipulation;
+    }
+    .btn-add:active { background:var(--rose); color:white; transform:scale(0.9); }
+
+    /* ── MODALES ── */
+    .overlay { position:fixed; inset:0; background:rgba(58,42,53,0.46); backdrop-filter:blur(7px); z-index:1000; display:none; align-items:center; justify-content:center; padding:16px; }
+    .overlay.on { display:flex; }
+    .mbox {
+      background:var(--parch); border-radius:22px;
+      padding:clamp(18px,5vw,30px) clamp(16px,5vw,26px);
+      width:min(420px,100%); max-height:92vh; overflow-y:auto;
+      box-shadow:0 20px 60px rgba(58,42,53,0.28);
+      animation:slideUp 0.3s cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+    @keyframes slideUp { from{opacity:0;transform:scale(0.88) translateY(14px)} to{opacity:1;transform:none} }
+    .mbox h3   { font-family:'Playfair Display',serif; font-size:1.25rem; color:var(--rose); text-align:center; margin-bottom:4px; }
+    .mbox .sub { font-size:0.74rem; color:rgba(58,42,53,0.46); text-align:center; margin-bottom:16px; font-style:italic; }
+    .mbox label{ font-size:0.7rem; color:var(--rose); letter-spacing:0.09em; text-transform:uppercase; display:block; margin:11px 0 4px; }
+    .mbox input,.mbox textarea { width:100%; padding:9px 13px; border-radius:11px; border:1.5px solid rgba(232,160,180,0.44); background:white; font-family:'Cormorant Garamond',serif; font-size:1rem; color:var(--ink); resize:none; outline:none; -webkit-appearance:none; transition:border-color 0.2s; }
+    .mbox input:focus,.mbox textarea:focus { border-color:var(--rose); }
+    .m-actions { display:flex; gap:10px; margin-top:16px; }
+    .btn-save   { flex:1; padding:10px; border-radius:30px; border:none; background:var(--rose); color:white; font-family:'Playfair Display',serif; font-size:0.92rem; cursor:pointer; }
+    .btn-cancel { padding:10px 15px; border-radius:30px; border:2px solid rgba(194,103,138,0.34); background:transparent; color:var(--rose); font-size:0.86rem; cursor:pointer; }
+
+    .cbox { background:var(--parch); border-radius:22px; padding:26px 22px; width:min(310px,100%); text-align:center; box-shadow:0 20px 60px rgba(58,42,53,0.28); animation:slideUp 0.28s cubic-bezier(0.34,1.56,0.64,1) both; }
+    .cbox h3 { font-family:'Playfair Display',serif; color:var(--rose); font-size:1.12rem; margin-bottom:8px; }
+    .cbox p  { font-size:0.8rem; color:rgba(58,42,53,0.56); font-style:italic; margin-bottom:18px; line-height:1.5; }
+    .c-actions { display:flex; gap:10px; justify-content:center; }
+    .btn-cyes { padding:9px 20px; border-radius:30px; border:none; background:var(--rose); color:white; font-size:0.9rem; cursor:pointer; }
+    .btn-cno  { padding:9px 16px; border-radius:30px; border:2px solid rgba(194,103,138,0.34); background:transparent; color:var(--rose); font-size:0.86rem; cursor:pointer; }
+
+    /* ── TOAST ── */
+    .toast { position:fixed; bottom:70px; left:50%; transform:translateX(-50%) translateY(10px); background:var(--rose); color:white; padding:9px 22px; border-radius:30px; font-size:0.8rem; z-index:2000; opacity:0; pointer-events:none; white-space:nowrap; transition:opacity 0.3s,transform 0.3s; }
+    .toast.on { opacity:1; transform:translateX(-50%) translateY(0); }
+
+    .fheart { position:fixed; pointer-events:none; z-index:999; font-size:1.3rem; animation:fup 2.2s ease-out forwards; }
+    @keyframes fup   { 0%{transform:translateY(0) scale(1);opacity:1} 100%{transform:translateY(-55vh) scale(0.3);opacity:0} }
+    @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
+    @keyframes blink { 0%,100%{opacity:0.5} 50%{opacity:1} }
   </style>
 </head>
 <body>
@@ -121,156 +210,344 @@
 <canvas id="bg-canvas"></canvas>
 
 <div class="app">
+
   <div class="counter">
     <div class="counter-main">
-      <div class="counter-unit"><span class="counter-val" id="c-y">0</span><span class="counter-lbl">años</span></div>
+      <div class="counter-unit">
+        <span class="counter-val" id="c-y">0</span>
+        <span class="counter-lbl">años</span>
+      </div>
       <span class="counter-sep">·</span>
-      <div class="counter-unit"><span class="counter-val" id="c-m">0</span><span class="counter-lbl">meses</span></div>
+      <div class="counter-unit">
+        <span class="counter-val" id="c-m">0</span>
+        <span class="counter-lbl">meses</span>
+      </div>
       <span class="counter-sep">·</span>
-      <div class="counter-unit"><span class="counter-val" id="c-d">0</span><span class="counter-lbl">días</span></div>
+      <div class="counter-unit">
+        <span class="counter-val" id="c-d">0</span>
+        <span class="counter-lbl">días</span>
+      </div>
+      <span class="counter-sep">·</span>
+      <div class="counter-unit">
+        <span class="counter-val" id="c-h">0</span>
+        <span class="counter-lbl">horas</span>
+      </div>
     </div>
     <div class="counter-since" id="c-since"></div>
   </div>
 
   <div class="book-scene">
     <div class="book">
-      <div class="spine"></div>
+      <div class="spine">
+        <div class="spine-dot" style="top:22%"></div>
+        <div class="spine-dot" style="top:50%"></div>
+        <div class="spine-dot" style="top:78%"></div>
+      </div>
       <div id="pages-root"></div>
-      <div class="page cover" id="cover" onclick="openBook()">
+      <div class="page cover" id="cover" style="z-index:150" onclick="openBook()">
+        <div class="cover-border"></div>
         <div class="p-front">
-          <h2 style="color:white; font-size: 1.8rem;">Para Ti 💖</h2>
-          <p style="color:white; opacity:0.8;">Toca para abrir nuestra historia</p>
+          <div style="font-size:clamp(1.5rem,5vw,2rem);margin-bottom:10px;animation:pulse 2.5s ease-in-out infinite">💖</div>
+          <h2 style="font-family:'Playfair Display';font-size:clamp(1.4rem,5vw,1.95rem);color:white;font-style:italic;text-shadow:0 2px 10px rgba(58,42,53,0.28);line-height:1.2">Para Ti</h2>
+          <p style="margin-top:9px;font-style:italic;color:rgba(255,255,255,0.84);font-size:clamp(0.76rem,2.3vw,0.92rem)">Nuestra historia en cada página</p>
+          <div style="margin-top:clamp(14px,3vh,24px);font-size:clamp(0.52rem,1.6vw,0.62rem);letter-spacing:3px;color:rgba(255,255,255,0.65);animation:blink 2.2s ease-in-out infinite">✦ TOCA PARA ABRIR ✦</div>
         </div>
       </div>
     </div>
   </div>
 
   <div class="book-nav" id="book-nav" style="display:none">
-    <button class="nav-btn" onclick="prevPage()">←</button>
-    <div id="nav-ind" style="font-size:0.9rem; color:var(--rose)">1 / 1</div>
-    <button class="nav-btn" onclick="nextPage()">→</button>
+    <button class="nav-btn" id="btn-prev" onclick="prevPage()">←</button>
+    <div class="nav-indicator" id="nav-ind">1 / 1</div>
+    <button class="nav-btn" id="btn-next" onclick="nextPage()">→</button>
   </div>
 
   <div class="music-bar" id="music-bar" style="display:none">
     <div class="music-info">
-      <div id="music-title" style="font-size:0.8rem; font-weight:bold; color:var(--rose)">Cargando música...</div>
-      <div class="music-progress" onclick="seekMusic(event)"><div class="music-fill" id="music-fill"></div></div>
+      <div class="music-title" id="music-title">♩ The Reason</div>
+      <div class="music-sub">nuestra playlist</div>
+      <div class="music-progress" onclick="seekMusic(event)">
+        <div class="music-fill" id="music-fill"></div>
+      </div>
     </div>
-    <button class="nav-btn" id="btn-play" onclick="togglePlay()">▷</button>
+    <div class="music-controls">
+      <button class="music-btn" onclick="prevTrack()">⟨</button>
+      <button class="music-btn" id="btn-play" onclick="togglePlay()">▷</button>
+      <button class="music-btn" onclick="nextTrack()">⟩</button>
+    </div>
   </div>
+
 </div>
 
-<div id="yt-player" style="position:absolute; top:-999px;"></div>
+<div style="position:fixed;bottom:-500px;left:0;width:2px;height:2px;opacity:0;pointer-events:none">
+  <div id="yt-player"></div>
+</div>
+
 <button class="btn-add" id="btn-add" onclick="openAddModal()">+</button>
 
 <div class="overlay" id="ov-add" onclick="if(event.target===this)closeAddModal()">
   <div class="mbox">
-    <h3>Escribir nueva nota</h3>
-    <textarea id="in-quote" style="width:100%; margin-top:10px; padding:10px;" rows="3" placeholder="Tu mensaje..."></textarea>
-    <button onclick="saveQuote()" style="width:100%; background:var(--rose); color:white; border:none; padding:10px; margin-top:10px; border-radius:5px;">Guardar 💖</button>
+    <h3>✦ Escribir en el libro</h3>
+    <p class="sub">Tu frase quedará guardada para siempre</p>
+    <label>Tu frase o mensaje *</label>
+    <textarea id="in-quote" rows="3" placeholder='"Lo que siento por ti..."'></textarea>
+    <label>Tu nombre</label>
+    <input id="in-author" type="text" placeholder="Tu nombre">
+    <label>Libro o fuente <span style="opacity:0.4;font-size:0.68rem">(opcional)</span></label>
+    <input id="in-book" type="text" placeholder="Nuestro diario...">
+    <div class="m-actions">
+      <button class="btn-cancel" onclick="closeAddModal()">Cancelar</button>
+      <button class="btn-save"   onclick="saveQuote()">Guardar 💖</button>
+    </div>
   </div>
 </div>
 
+<div class="overlay" id="ov-confirm" onclick="if(event.target===this)closeConfirm()">
+  <div class="cbox">
+    <h3>¿Eliminar esta frase?</h3>
+    <p id="confirm-text"></p>
+    <div class="c-actions">
+      <button class="btn-cno"  onclick="closeConfirm()">Cancelar</button>
+      <button class="btn-cyes" onclick="doDelete()">Eliminar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
 <script>
+/* ── CONFIG ── */
 const START = new Date('2024-12-13T00:00:00');
 const PLAYLIST = [
   { title:'The Reason', id:'fV4DiAyExN0' },
-  { title:'Wonderwall',  id:'bx1Bh8ZvH84' }
+  { title:'Wonderwall',  id:'bx1Bh8ZvH84' },
 ];
-
 const FIXED = [
   { q:'No importa lo que pase mañana, te quiero hoy.', s:'Nuestro Camino Eterno' },
-  { q:'¿Me amas? ¿Real o no real? —Real.', s:'Los Juegos del Hambre' }
+  { q:'¿Me amas? ¿Real o no real? —Real.', s:'Los Juegos del Hambre' },
+  { q:'Eres lo único que me hace sentir seguro en este mundo.', s:'Los Juegos del Hambre' },
+  { q:'Ella no me necesita. Y yo... yo no puedo vivir sin ella.', s:'Los Juegos del Hambre' },
+  { q:'—Buenas noches, Liam. —Buenas noches, supernova.', s:'Hasta que nos quedemos sin estrellas' },
+  { q:'No quiero que me bajen la luna, quiero que alguien se siente a verla conmigo.', s:'Hasta que nos quedemos sin estrellas' },
+  { q:'Aprendí que el hogar no es un lugar, es una persona. Y mi hogar eres tú.', s:'Hasta que nos quedemos sin estrellas' },
+  { q:'Rompe mi corazón si quieres, pero no te vayas. Nunca lo hagas.', s:'Boulevard' },
+  { q:'Ahora sé que la droga más fuerte de un ser humano es otro ser humano.', s:'Boulevard' },
+  { q:'Luke era el sol y yo la luna, y en un mundo perfecto, el eclipse sería eterno.', s:'Boulevard' },
+  { q:'—Sí, me gusta —sonreí—. Tú me gustas.', s:'Boulevard' },
+  { q:'Si el mundo se acaba hoy, me gustaría que me encontrara a tu lado.', s:'Boulevard' },
 ];
 
-let pages = [], curPage = -1, bookOpen = false, ytReady = false, ytPlayer = null;
+let pages = [], curPage = -1, bookOpen = false, flipping = false, delPending = -1;
+let ytPlayer = null, ytReady = false, trackIdx = 0, rafProg = null;
 
-// INICIALIZACIÓN
-function buildBook() {
+/* ── RECONSTRUCCIÓN DEL LIBRO (CON CORRECCIÓN DE PERSISTENCIA) ── */
+function loadQ(){ try{ return JSON.parse(localStorage.getItem('amor_q')||'[]'); }catch{ return []; } }
+function saveQ(a){ localStorage.setItem('amor_q', JSON.stringify(a)); }
+
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function buildBook(){
   const root = document.getElementById('pages-root');
-  root.innerHTML = '';
-  const all = [...FIXED, ...JSON.parse(localStorage.getItem('amor_q') || '[]')];
+  root.innerHTML = ''; pages = [];
+  const custom = loadQ();
+  const all = [...FIXED, ...custom];
+
   all.forEach((item, i) => {
+    const isC = i >= FIXED.length;
     const pg = document.createElement('div');
     pg.className = 'page';
     pg.style.zIndex = all.length - i;
-    pg.innerHTML = `<div class="p-front"><p>"${item.q}"</p><span>${item.s}</span></div><div class="p-back">💖</div>`;
+    pg.innerHTML = `
+      <div class="p-front">
+        ${isC ? '<div class="p-badge">✦ Escrito por nosotros ✦</div>' : ''}
+        <div class="p-ornament"></div>
+        <p class="p-quote">"${esc(item.q)}"</p>
+        <div class="p-ornament"></div>
+        <span class="p-source">${esc(item.s||'')}</span>
+        ${isC && item.a ? `<div class="p-author">— ${esc(item.a)}</div>` : ''}
+        ${isC ? `<button class="p-del" onclick="openDeleteModal(${i-FIXED.length})">×</button>` : ''}
+        <div class="p-num r">Pág. ${(i+1)*2-1}</div>
+      </div>
+      <div class="p-back">
+        <div class="p-ornament"></div>
+        <div style="font-size:1.3rem;margin:5px 0">💖</div>
+        <div style="font-size:0.74rem;font-style:italic;color:rgba(58,42,53,0.35)">Con amor, siempre</div>
+        <div class="p-ornament"></div>
+        <div class="p-num l">Pág. ${(i+1)*2}</div>
+      </div>`;
     root.appendChild(pg);
     pages.push(pg);
   });
-  document.getElementById('nav-ind').textContent = `1 / ${pages.length}`;
+  if(curPage === -1) updateNav();
 }
 
-function openBook() {
+/* ── CORRECCIÓN DE AUDIO (UNLOCK AL ABRIR) ── */
+function openBook(){
   if(bookOpen) return;
   bookOpen = true;
   document.getElementById('cover').classList.add('flipped');
-  document.getElementById('book-nav').style.display = 'flex';
-  document.getElementById('btn-add').style.display = 'flex';
+  document.getElementById('book-nav').style.display  = 'flex';
+  document.getElementById('btn-add').style.display   = 'flex';
   document.getElementById('music-bar').style.display = 'flex';
   
-  // UNLOCK AUDIO PARA MÓVILES
-  if(ytReady && ytPlayer) {
-    ytPlayer.playVideo();
-  }
+  // Intenta reproducir para saltar bloqueo de móviles
+  if(ytReady && ytPlayer) ytPlayer.playVideo();
   
-  setTimeout(() => { curPage = 0; updateNav(); }, 800);
+  setTimeout(() => goTo(0), 700);
 }
 
-// NAVEGACIÓN
-function nextPage() { if(curPage < pages.length-1) { curPage++; pages[curPage].classList.add('flipped'); updateNav(); }}
-function prevPage() { if(curPage >= 0) { pages[curPage].classList.remove('flipped'); curPage--; updateNav(); }}
-function updateNav() { document.getElementById('nav-ind').textContent = `${Math.max(1, curPage+1)} / ${pages.length}`; }
-
-// PERSISTENCIA
-function saveQuote() {
-  const q = document.getElementById('in-quote').value;
-  if(!q) return;
-  const custom = JSON.parse(localStorage.getItem('amor_q') || '[]');
-  custom.push({q, s: 'Escrito por nosotros'});
-  localStorage.setItem('amor_q', JSON.stringify(custom));
-  location.reload(); // Recarga para reconstruir el libro con la nueva página
+/* ── NAVEGACIÓN ── */
+function goTo(target){
+  if(flipping || target === curPage) return;
+  if(target < 0 || target >= pages.length) return;
+  flipping = true;
+  const steps = [];
+  if(target > curPage){ for(let i = curPage+1; i <= target; i++) steps.push({el:pages[i], f:true}); }
+  else { for(let i = curPage; i > target; i--) steps.push({el:pages[i], f:false}); }
+  let s = 0;
+  const run = () => {
+    if(s >= steps.length){ curPage = target; updateNav(); flipping = false; return; }
+    const {el, f} = steps[s++];
+    f ? el.classList.add('flipped') : el.classList.remove('flipped');
+    setTimeout(run, steps.length === 1 ? 0 : 118);
+  };
+  run();
 }
 
-// YOUTUBE API
+function nextPage(){ if(!flipping) goTo(curPage+1); }
+function prevPage(){ if(!flipping) goTo(curPage-1); }
+
+function updateNav(){
+  document.getElementById('btn-prev').disabled = curPage <= 0;
+  document.getElementById('btn-next').disabled = curPage >= pages.length - 1;
+  document.getElementById('nav-ind').textContent = `${Math.max(1, curPage+1)} / ${pages.length}`;
+}
+
+/* ── YOUTUBE API ── */
 const tag = document.createElement('script');
 tag.src = "https://www.youtube.com/iframe_api";
 document.head.appendChild(tag);
 
-function onYouTubeIframeAPIReady() {
+window.onYouTubeIframeAPIReady = function(){
   ytPlayer = new YT.Player('yt-player', {
-    height: '0', width: '0', videoId: PLAYLIST[0].id,
-    events: {
-      'onReady': (e) => { ytReady = true; document.getElementById('music-title').textContent = PLAYLIST[0].title; },
-      'onStateChange': (e) => {
-        const btn = document.getElementById('btn-play');
-        btn.textContent = (e.data === YT.PlayerState.PLAYING) ? '⏸' : '▷';
+    height:'1', width:'1', videoId: PLAYLIST[0].id,
+    playerVars:{ autoplay:0, controls:0, playsinline:1 },
+    events:{
+      onReady: () => { ytReady = true; },
+      onStateChange: e => {
+        if(e.data === YT.PlayerState.PLAYING){ document.getElementById('btn-play').textContent = '⏸'; startProg(); }
+        else { document.getElementById('btn-play').textContent = '▷'; stopProg(); }
+        if(e.data === YT.PlayerState.ENDED) nextTrack();
       }
     }
   });
+};
+
+function togglePlay(){ if(ytReady) ytPlayer.getPlayerState() === 1 ? ytPlayer.pauseVideo() : ytPlayer.playVideo(); }
+function nextTrack(){ loadTrack(trackIdx+1); }
+function prevTrack(){ loadTrack(trackIdx-1); }
+function loadTrack(idx){
+  trackIdx = (idx + PLAYLIST.length) % PLAYLIST.length;
+  document.getElementById('music-title').textContent = '♩ ' + PLAYLIST[trackIdx].title;
+  if(ytReady) ytPlayer.loadVideoById(PLAYLIST[trackIdx].id);
 }
 
-function togglePlay() { if(ytReady) ytPlayer.getPlayerState() === 1 ? ytPlayer.pauseVideo() : ytPlayer.playVideo(); }
-
-// CONTADOR Y CANVAS (Optimizado)
-function updateCounter() {
-  const diff = new Date() - START;
-  document.getElementById('c-y').textContent = Math.floor(diff / (1000*60*60*24*365));
-  document.getElementById('c-m').textContent = Math.floor((diff % (1000*60*60*24*365)) / (1000*60*60*24*30));
-  document.getElementById('c-d').textContent = Math.floor((diff % (1000*60*60*24*30)) / (1000*60*60*24));
+function startProg(){
+  const tick = () => {
+    if(ytPlayer && ytReady){
+      const dur = ytPlayer.getDuration();
+      const cur = ytPlayer.getCurrentTime();
+      if(dur > 0) document.getElementById('music-fill').style.width = ((cur/dur)*100)+'%';
+    }
+    rafProg = requestAnimationFrame(tick);
+  };
+  rafProg = requestAnimationFrame(tick);
 }
+function stopProg(){ cancelAnimationFrame(rafProg); rafProg = null; }
+
+function seekMusic(e){
+  if(!ytReady) return;
+  const rect = e.currentTarget.getBoundingClientRect();
+  const dur = ytPlayer.getDuration();
+  ytPlayer.seekTo(((e.clientX - rect.left) / rect.width) * dur);
+}
+
+/* ── NOTAS PERSONALIZADAS ── */
+function openAddModal(){ document.getElementById('ov-add').classList.add('on'); }
+function closeAddModal(){ document.getElementById('ov-add').classList.remove('on'); }
+
+function saveQuote(){
+  const q = document.getElementById('in-quote').value.trim();
+  const a = document.getElementById('in-author').value.trim();
+  const b = document.getElementById('in-book').value.trim();
+  if(!q) return;
+  const arr = loadQ();
+  arr.push({q, a, s: b||'Nuestro libro', t: Date.now()});
+  saveQ(arr);
+  closeAddModal();
+  buildBook();
+  setTimeout(() => goTo(pages.length - 1), 400);
+  showToast('✦ Frase guardada 💖');
+}
+
+function openDeleteModal(idx){
+  delPending = idx;
+  document.getElementById('ov-confirm').classList.add('on');
+}
+function closeConfirm(){ document.getElementById('ov-confirm').classList.remove('on'); }
+function doDelete(){
+  const arr = loadQ();
+  arr.splice(delPending, 1);
+  saveQ(arr);
+  closeConfirm();
+  location.reload(); // Recarga limpia para actualizar índices
+}
+
+/* ── CONTADOR ── */
+function updateCounter(){
+  const now = new Date();
+  let y = now.getFullYear() - START.getFullYear();
+  let m = now.getMonth() - START.getMonth();
+  let d = now.getDate() - START.getDate();
+  if(d < 0){ m--; d += new Date(now.getFullYear(), now.getMonth(), 0).getDate(); }
+  if(m < 0){ y--; m += 12; }
+  document.getElementById('c-y').textContent = y;
+  document.getElementById('c-m').textContent = m;
+  document.getElementById('c-d').textContent = d;
+  document.getElementById('c-h').textContent = now.getHours();
+}
+setInterval(updateCounter, 1000 * 60);
 updateCounter();
-buildBook();
+document.getElementById('c-since').textContent = 'Desde el ' + START.toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'}) + ' 💖';
 
-// Partículas ligeras para CERO LAG
-const canvas = document.getElementById('bg-canvas');
-const ctx = canvas.getContext('2d');
-canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-function render() {
-  ctx.clearRect(0,0,canvas.width, canvas.height);
-  requestAnimationFrame(render);
+/* ── CANVAS & PARTICULAS ── */
+(function(){
+  const cv = document.getElementById('bg-canvas');
+  const ctx = cv.getContext('2d');
+  let pts = [];
+  function resize(){ cv.width = innerWidth; cv.height = innerHeight; }
+  window.addEventListener('resize', resize); resize();
+  function loop(){
+    ctx.clearRect(0,0,cv.width,cv.height);
+    if(pts.length < 15) pts.push({x:Math.random()*cv.width, y:cv.height+10, v:Math.random()*0.5+0.2, o:1});
+    pts.forEach((p,i) => {
+      p.y -= p.v; p.o -= 0.001;
+      ctx.fillStyle = `rgba(232,160,180,${p.o})`;
+      ctx.beginPath(); ctx.arc(p.x, p.y, 2, 0, Math.PI*2); ctx.fill();
+      if(p.o <= 0) pts.splice(i,1);
+    });
+    requestAnimationFrame(loop);
+  }
+  loop();
+})();
+
+function showToast(m){
+  const el = document.getElementById('toast');
+  el.textContent = m; el.classList.add('on');
+  setTimeout(() => el.classList.remove('on'), 2500);
 }
-render();
+
+buildBook();
 </script>
 </body>
 </html>
